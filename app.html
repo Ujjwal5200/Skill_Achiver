@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timed Skill Assessment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #0a0e27;
+            --color-bg-light: #131842;
+            --color-cyan: #00f0ff;
+            --color-violet: #a855f7;
+            --color-white: #e2e8f0;
+            --color-green: #10b981;
+            --color-red: #ef4444;
+            --color-amber: #f59e0b;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-white);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section Styles */
+        .hero-content {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid var(--color-cyan);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--color-cyan);
+            margin-bottom: 25px;
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-title-line {
+            display: block;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 500px;
+            margin: 0 auto 35px;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        .btn-large {
+            padding: 18px 45px;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeInUp 0.8s ease-out 0.5s backwards;
+        }
+
+        .btn-arrow {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-large:hover .btn-arrow {
+            transform: translateX(5px);
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 200px;
+            margin-top: 20px;
+        }
+
+        .floating-card {
+            position: absolute;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .floating-card.card-1 {
+            top: 20px;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-card.card-2 {
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.5s;
+        }
+
+        .floating-card.card-3 {
+            top: 20px;
+            right: 10%;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(-50%); }
+            50% { transform: translateY(-15px) translateX(-50%); }
+        }
+
+        .floating-card.card-1, .floating-card.card-3 {
+            animation-name: floatSide;
+        }
+
+        @keyframes floatSide {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .floating-card.card-2 {
+            animation-name: floatCenter;
+        }
+
+        @keyframes floatCenter {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-15px); }
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .card-text {
+            font-size: 0.8rem;
+            color: var(--color-white);
+            opacity: 0.8;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--color-cyan);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .skill-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--color-bg-light);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            margin-top: 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .skill-suggestions.active {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .skill-suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.2s ease;
+        }
+
+        .skill-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-suggestion-item:hover {
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        .skill-suggestion-item .skill-name {
+            font-weight: 500;
+            color: var(--color-white);
+        }
+
+        .skill-suggestion-item .skill-fullname {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .skill-suggestion-item .match-type {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(0, 240, 255, 0.2);
+            color: var(--color-cyan);
+        }
+
+        .skill-suggestion-item .match-type.exact {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--color-green);
+        }
+
+        .skill-suggestion-item .match-type.partial {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--color-amber);
+        }
+
+        .skill-suggestions::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .skill-suggestions::-webkit-scrollbar-track {
+            background: var(--color-bg);
+            border-radius: 3px;
+        }
+
+        .skill-suggestions::-webkit-scrollbar-thumb {
+            background: var(--color-cyan);
+            border-radius: 3px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-label .required {
+            color: var(--color-red);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--color-bg-light);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--color-white);
+            font-size: 1rem;
+            font-family: var(--font-body);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: var(--color-bg-light);
+            color: var(--color-white);
+            padding: 10px;
+        }
+
+        .form-select option:first-child {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--color-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-error {
+            color: var(--color-red);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-error.visible {
+            display: block;
+        }
+
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 600;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-violet));
+            color: var(--color-bg);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-banner {
+            padding: 15px 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--color-red);
+            border-radius: 10px;
+            color: var(--color-red);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-banner.visible {
+            display: block;
+        }
+
+        /* Quiz Header */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .progress-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .question-counter {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .attempt-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--color-cyan);
+        }
+
+        .section-indicator {
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .section-indicator.section-1 {
+            background: rgba(0, 240, 255, 0.2);
+            color: var(--color-cyan);
+        }
+
+        .section-indicator.section-2 {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--color-violet);
+        }
+
+        .section-indicator.section-3 {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--color-amber);
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timer-ring {
+            position: relative;
+            width: 70px;
+            height: 70px;
+        }
+
+        .timer-ring svg {
+            transform: rotate(-90deg);
+            width: 70px;
+            height: 70px;
+        }
+
+        .timer-bg {
+            fill: none;
+            stroke: var(--glass-border);
+            stroke-width: 5;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: var(--color-cyan);
+            stroke-width: 5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+        }
+
+        .timer-progress.warning {
+            stroke: var(--color-amber);
+        }
+
+        .timer-progress.danger {
+            stroke: var(--color-red);
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .timer-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        .timer-text.warning {
+            color: var(--color-amber);
+        }
+
+        .timer-text.danger {
+            color: var(--color-red);
+            animation: timerPulse 0.5s infinite;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            padding: 14px 18px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-item:hover {
+            border-color: var(--color-cyan);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .option-item.selected {
+            border-color: var(--color-cyan);
+            background: rgba(0, 240, 255, 0.15);
+        }
+
+        .option-marker {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .option-item.selected .option-marker {
+            border-color: var(--color-cyan);
+            background: var(--color-cyan);
+            color: var(--color-bg);
+        }
+
+        /* Submit Button */
+        .submit-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .submit-section .btn {
+            min-width: 140px;
+        }
+
+        /* Results */
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 12vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--color-cyan), var(--color-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .pass-status {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            margin-top: 15px;
+        }
+
+        .pass-status.passed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--color-green);
+        }
+
+        .pass-status.failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--color-red);
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--color-white);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--color-cyan);
+        }
+
+        .results-detail {
+            margin-top: 25px;
+            text-align: left;
+        }
+
+        .results-detail h3 {
+            font-family: var(--font-display);
+            color: var(--color-cyan);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .question-review {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .question-review.correct {
+            border-color: var(--color-green);
+        }
+
+        .question-review.incorrect {
+            border-color: var(--color-red);
+        }
+
+        .question-review.unanswered {
+            border-color: var(--color-amber);
+            opacity: 0.7;
+        }
+
+        .review-question {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .review-answer {
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .review-answer.correct-answer {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-green);
+        }
+
+        .review-answer.wrong-answer {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-red);
+        }
+
+        .review-answer.your-answer {
+            color: var(--color-white);
+            opacity: 0.8;
+        }
+
+        .review-explanation {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--color-cyan);
+            border-right-color: var(--color-violet);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, colorShift 2s ease-in-out infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes colorShift {
+            0% { border-top-color: var(--color-cyan); border-right-color: var(--glass-border); }
+            50% { border-top-color: var(--color-violet); border-right-color: var(--color-cyan); }
+            100% { border-top-color: var(--color-cyan); border-right-color: var(--glass-border); }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-status {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--color-cyan);
+            margin-bottom: 15px;
+            min-height: 30px;
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 6px;
+            background: var(--glass-border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--color-cyan), var(--color-violet));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            animation: progressPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-subtext {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .loading-text {
+            text-align: center;
+            color: var(--color-cyan);
+            font-family: var(--font-display);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            .card { padding: 18px; }
+            .quiz-header { flex-direction: column; align-items: flex-start; }
+            .timer-container { align-self: flex-end; }
+            .question-card { padding: 18px; }
+            .option-item { padding: 12px 14px; }
+            
+            .hero-title { font-size: 1.8rem; }
+            .hero-visual { display: none; }
+            .btn-large { padding: 14px 30px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bgCanvas"></canvas>
+    <div class="container">
+        <header>
+            <h1 class="logo">Skill Assessment</h1>
+        </header>
+
+        <!-- Hero Section -->
+        <section id="heroSection">
+            <div class="hero-content">
+                <div class="hero-badge">AI-Powered Assessment Platform</div>
+                <h2 class="hero-title">
+                    <span class="hero-title-line">Prove Your</span>
+                    <span class="hero-title-line gradient-text">Technical Excellence</span>
+                </h2>
+                <p class="hero-subtitle">
+                    Take on challenging questions designed by industry experts. 
+                    Demonstrate your skills and get certified.
+                </p>
+                <button class="btn btn-primary btn-large" id="startHeroBtn">
+                    <span>Begin Assessment</span>
+                    <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-card card-1">
+                    <div class="card-icon">⚡</div>
+                    <div class="card-text">AI Generated</div>
+                </div>
+                <div class="floating-card card-2">
+                    <div class="card-icon">🎯</div>
+                    <div class="card-text">Skills    </div>
+                </div>
+                <div class="floating-card card-3">
+                    <div class="card-icon">🏆</div>
+                    <div class="card-text">Certification</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Section -->
+        <section id="registrationSection" class="hidden">
+            <div class="error-banner" id="regError"></div>
+            
+            <div class="card">
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="fullName" placeholder="Full Name">
+                        <div class="form-error" id="nameError">Please enter your full name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="userId" placeholder="User ID">
+                        <div class="form-error" id="idError">Please enter a valid User ID</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" class="form-input" id="skillInput" placeholder="Type a skill (e.g., aws, js, ml)">
+                        <div class="skill-suggestions" id="skillSuggestions"></div>
+                        <div class="form-error" id="skillError">Please enter a skill</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="number" class="form-input" id="experience" placeholder="Years of Experience" min="0" max="50">
+                        <div class="form-error" id="expError">Enter 0-50 years</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Start Assessment</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Loading Section -->
+        <section id="loadingSection" class="hidden">
+            <div class="card">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-status" id="loadingStatus">Initializing...</div>
+                    <div class="loading-progress">
+                        <div class="loading-progress-bar" id="loadingProgressBar"></div>
+                    </div>
+                    <div class="loading-subtext" id="loadingSubtext">Please wait while we prepare your assessment</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quizSection" class="hidden">
+            <div class="quiz-header">
+                <div class="progress-info">
+                    <div class="question-counter">
+                        Question <span id="currentQ">1</span> of <span id="totalQ">20</span>
+                        <span class="attempt-badge" id="attemptBadge">Attempt 1 of 2</span>
+                    </div>
+                    <span class="section-indicator section-1" id="sectionIndicator">Section 1: Questions 1-10</span>
+                </div>
+                <div class="timer-container">
+                    <div class="timer-ring">
+                        <svg viewBox="0 0 70 70">
+                            <circle class="timer-bg" cx="35" cy="35" r="30"/>
+                            <circle class="timer-progress" id="timerProgress" cx="35" cy="35" r="30" 
+                                stroke-dasharray="188.5" stroke-dashoffset="0"/>
+                        </svg>
+                        <div class="timer-text" id="timerText">12</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question-card">
+                <p class="question-text" id="qText">Loading question...</p>
+                
+                <div class="options-list" id="optionsList"></div>
+            </div>
+            
+            <div class="submit-section">
+                <button class="btn btn-secondary" id="skipBtn">Skip</button>
+                <button class="btn btn-primary" id="nextBtn">Submit & Next</button>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="hidden">
+            <div class="results-header">
+                <div class="score-display" id="finalScore">0%</div>
+                <div class="score-label">Assessment Complete</div>
+                <div class="pass-status" id="passStatus">Passed</div>
+            </div>
+            
+            <div class="results-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="correctCount">0</div>
+                    <div class="stat-label">Correct</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="incorrectCount">0</div>
+                    <div class="stat-label">Incorrect</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="unansweredCount">0</div>
+                    <div class="stat-label">Unanswered</div>
+                </div>
+            </div>
+
+            <div id="resultsDetail" class="results-detail"></div>
+            
+            <div class="btn-row">
+                <button class="btn btn-secondary" id="newTestBtn">New Assessment</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Animated Background - Rich, stunning visuals with mouse interaction
+        (function() {
+            const canvas = document.getElementById('bgCanvas');
+            const ctx = canvas.getContext('2d', { alpha: false });
+            
+            let width, height;
+            let particles = [];
+            let stars = [];
+            let orbs = [];
+            let shootingStars = [];
+            let nebulaClouds = [];
+            let lastTime = 0;
+            
+            // Mouse/gyro interaction for parallax
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            
+            const CONFIG = { fps: 60 };
+            const colors = ['#00f0ff', '#a855f7', '#6366f1', '#8b5cf6', '#06b6d4', '#ec4899', '#f472b6', '#38bdf8'];
+            
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                initElements();
+            }
+            
+            function initElements() {
+                // Stars
+                stars = [];
+                for (let i = 0; i < 150; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        size: Math.random() * 1.5,
+                        depth: 0.2 + Math.random() * 0.8, // depth affects movement
+                        opacity: 0.2 + Math.random() * 0.5,
+                        twinkle: Math.random() * Math.PI * 2
+                    });
+                }
+                
+                // Main particles with depth
+                particles = [];
+                for (let i = 0; i < 70; i++) {
+                    particles.push(createParticle());
+                }
+                
+                // Floating orbs
+                orbs = [];
+                for (let i = 0; i < 10; i++) {
+                    orbs.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        size: 40 + Math.random() * 80,
+                        speedX: (Math.random() - 0.5) * 0.5,
+                        speedY: -(0.1 + Math.random() * 0.4),
+                        opacity: 0.04 + Math.random() * 0.06,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        pulse: Math.random() * Math.PI * 2,
+                        depth: 0.3 + Math.random() * 0.7
+                    });
+                }
+                
+                // Nebula clouds with depth
+                nebulaClouds = [];
+                for (let i = 0; i < 5; i++) {
+                    nebulaClouds.push({
+                        x: Math.random() * width,
+                        y: height * 0.2 + Math.random() * height * 0.5,
+                        radius: 250 + Math.random() * 350,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        speedX: (Math.random() - 0.5) * 0.25,
+                        speedY: -(0.05 + Math.random() * 0.15),
+                        opacity: 0.03 + Math.random() * 0.05,
+                        depth: 0.2 + Math.random() * 0.6
+                    });
+                }
+            }
+            
+            function createParticle(startY) {
+                return {
+                    x: Math.random() * width,
+                    y: startY !== undefined ? startY : Math.random() * height,
+                    size: 1.5 + Math.random() * 5,
+                    speedX: (Math.random() - 0.5) * 1.0,
+                    speedY: -(0.3 + Math.random() * 1.2),
+                    vx: (Math.random() - 0.5) * 0.3, // extra velocity
+                    vy: (Math.random() - 0.5) * 0.2,
+                    opacity: 0.3 + Math.random() * 0.6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    pulse: Math.random() * Math.PI * 2,
+                    depth: 0.3 + Math.random() * 0.7,
+                    trail: []
+                };
+            }
+            
+            function spawnShootingStar() {
+                if (Math.random() < 0.006 && shootingStars.length < 4) {
+                    shootingStars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height * 0.5,
+                        length: 60 + Math.random() * 120,
+                        speed: 10 + Math.random() * 15,
+                        angle: Math.PI / 4 + (Math.random() - 0.5) * 0.4,
+                        opacity: 0.8 + Math.random() * 0.2,
+                        life: 1
+                    });
+                }
+            }
+            
+            // Mouse move handler for parallax
+            document.addEventListener('mousemove', (e) => {
+                targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+                targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+            
+            // Touch support
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    targetX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+                    targetY = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
+                }
+            });
+            
+            // Device orientation for mobile
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', (e) => {
+                    if (e.gamma !== null && e.beta !== null) {
+                        targetX = Math.min(Math.max(e.gamma / 45, -1), 1);
+                        targetY = Math.min(Math.max((e.beta - 45) / 45, -1), 1);
+                    }
+                });
+            }
+            
+            function drawBackground(time) {
+                const phase = time * 0.00006;
+                const g = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height));
+                g.addColorStop(0, `hsl(${240 + Math.sin(phase) * 20}, 40%, 12%)`);
+                g.addColorStop(0.5, `hsl(${260 + Math.sin(phase * 1.1) * 25}, 35%, 8%)`);
+                g.addColorStop(1, `hsl(${220 + Math.cos(phase * 0.8) * 15}, 45%, 5%)`);
+                ctx.fillStyle = g;
+                ctx.fillRect(0, 0, width, height);
+            }
+            
+            function drawStars(time) {
+                // Smooth parallax
+                mouseX += (targetX - mouseX) * 0.05;
+                mouseY += (targetY - mouseY) * 0.05;
+                
+                for (let i = 0; i < stars.length; i++) {
+                    const s = stars[i];
+                    s.twinkle += 0.02;
+                    const op = s.opacity * (0.5 + Math.sin(s.twinkle) * 0.5);
+                    
+                    // Parallax offset
+                    const px = s.x + mouseX * s.depth * 30;
+                    const py = s.y + mouseY * s.depth * 20;
+                    
+                    ctx.beginPath();
+                    ctx.arc(px, py, s.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${op})`;
+                    ctx.fill();
+                }
+            }
+            
+            function drawNebula(time) {
+                const t = time * 0.0003;
+                for (let i = 0; i < nebulaClouds.length; i++) {
+                    const n = nebulaClouds[i];
+                    
+                    // Movement + mouse parallax
+                    n.x += n.speedX + Math.sin(t + i) * 0.15;
+                    n.y += n.speedY;
+                    
+                    const px = n.x + mouseX * n.depth * 50;
+                    const py = n.y + mouseY * n.depth * 30;
+                    
+                    if (n.y < -n.radius) n.y = height + n.radius;
+                    if (n.x < -n.radius) n.x = width + n.radius;
+                    if (n.x > width + n.radius) n.x = -n.radius;
+                    
+                    const grd = ctx.createRadialGradient(px, py, 0, px, py, n.radius);
+                    const hex = n.color;
+                    const r = parseInt(hex.slice(1,3), 16);
+                    const g = parseInt(hex.slice(3,5), 16);
+                    const b = parseInt(hex.slice(5,7), 16);
+                    grd.addColorStop(0, `rgba(${r},${g},${b},${n.opacity})`);
+                    grd.addColorStop(0.5, `rgba(${r},${g},${b},${n.opacity * 0.5})`);
+                    grd.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+            
+            function drawAurora(time) {
+                ctx.globalAlpha = 0.15;
+                const t = time * 0.0006;
+                
+                // Aurora also moves with mouse subtly
+                const auroraOffsetX = mouseX * 20;
+                const auroraOffsetY = mouseY * 15;
+                
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    const freq = 0.0015 + i * 0.001;
+                    const amp = 50 + i * 25;
+                    const offset = i * 2.5 + t;
+                    
+                    for (let x = 0; x <= width; x += 10) {
+                        const y = height * 0.18 + auroraOffsetY + 
+                            Math.sin(x * freq + offset) * amp +
+                            Math.sin(x * freq * 2.2 + t * 1.1) * amp * 0.5 +
+                            Math.sin(x * freq * 0.6 + t * 0.4) * amp * 0.25;
+                        x === 0 ? ctx.moveTo(x + auroraOffsetX, y) : ctx.lineTo(x + auroraOffsetX, y);
+                    }
+                    ctx.lineTo(width + auroraOffsetX, height);
+                    ctx.lineTo(auroraOffsetX, height);
+                    ctx.closePath();
+                    
+                    const grd = ctx.createLinearGradient(0, 0, 0, height * 0.55);
+                    grd.addColorStop(0, `hsla(${230 + i * 35}, 85%, 48%, ${0.22 - i * 0.04})`);
+                    grd.addColorStop(0.4, `hsla(${260 + i * 30}, 75%, 52%, ${0.14 - i * 0.03})`);
+                    grd.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grd;
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+            
+            function drawOrbs(time) {
+                const t = time * 0.001;
+                for (let i = 0; i < orbs.length; i++) {
+                    const o = orbs[i];
+                    o.pulse += 0.008;
+                    
+                    // Movement + mouse parallax
+                    o.x += o.speedX + Math.sin(t + i * 0.5) * 0.3;
+                    o.y += o.speedY + Math.cos(t * 0.8 + i) * 0.2;
+                    
+                    const px = o.x + mouseX * o.depth * 60;
+                    const py = o.y + mouseY * o.depth * 40;
+                    
+                    if (o.y < -o.size) { o.y = height + o.size; o.x = Math.random() * width; }
+                    if (o.x < -o.size) o.x = width + o.size;
+                    if (o.x > width + o.size) o.x = -o.size;
+                    
+                    const currentOp = o.opacity * (0.7 + Math.sin(o.pulse) * 0.3);
+                    const grd = ctx.createRadialGradient(px, py, 0, px, py, o.size);
+                    const hex = o.color;
+                    const r = parseInt(hex.slice(1,3), 16);
+                    const g = parseInt(hex.slice(3,5), 16);
+                    const b = parseInt(hex.slice(5,7), 16);
+                    grd.addColorStop(0, `rgba(${r},${g},${b},${currentOp})`);
+                    grd.addColorStop(0.6, `rgba(${r},${g},${b},${currentOp * 0.3})`);
+                    grd.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+            
+            function drawParticles(time) {
+                const t = time * 0.001;
+                
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.pulse += 0.015;
+                    
+                    // More dynamic movement
+                    p.x += p.speedX + p.vx + Math.sin(t + i) * 0.2;
+                    p.y += p.speedY + p.vy + Math.cos(t * 1.2 + i) * 0.1;
+                    
+                    // Mouse parallax
+                    const px = p.x + mouseX * p.depth * 40;
+                    const py = p.y + mouseY * p.depth * 25;
+                    
+                    // Trail
+                    p.trail.unshift({ x: px, y: py, opacity: p.opacity });
+                    if (p.trail.length > 8) p.trail.pop();
+                    
+                    for (let j = 0; j < p.trail.length; j++) {
+                        const tr = p.trail[j];
+                        const trailOp = (1 - j / p.trail.length) * 0.35 * p.opacity;
+                        ctx.beginPath();
+                        ctx.arc(tr.x, tr.y, p.size * 0.6, 0, Math.PI * 2);
+                        ctx.fillStyle = p.color + Math.floor(trailOp * 200).toString(16).padStart(2, '0');
+                        ctx.fill();
+                    }
+                    
+                    // Main particle
+                    const currOp = p.opacity * (0.6 + Math.sin(p.pulse) * 0.4);
+                    const sz = p.size * (1 + Math.sin(p.pulse) * 0.2);
+                    
+                    ctx.beginPath();
+                    const grd = ctx.createRadialGradient(px, py, 0, px, py, sz * 3);
+                    grd.addColorStop(0, p.color);
+                    grd.addColorStop(0.3, p.color + Math.floor(currOp * 180).toString(16).padStart(2, '0'));
+                    grd.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grd;
+                    ctx.fill();
+                    
+                    if (p.y < -20) { p.y = height + 20; p.x = Math.random() * width; p.trail = []; }
+                    if (p.x < -20) p.x = width + 20;
+                    if (p.x > width + 20) p.x = -20;
+                }
+            }
+            
+            function drawShootingStars(time) {
+                for (let i = shootingStars.length - 1; i >= 0; i--) {
+                    const s = shootingStars[i];
+                    s.x += Math.cos(s.angle) * s.speed;
+                    s.y += Math.sin(s.angle) * s.speed;
+                    s.life -= 0.02;
+                    
+                    if (s.life <= 0 || s.x > width || s.y > height) {
+                        shootingStars.splice(i, 1);
+                        continue;
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(s.x, s.y);
+                    ctx.lineTo(s.x - Math.cos(s.angle) * s.length, s.y - Math.sin(s.angle) * s.length);
+                    const grd = ctx.createLinearGradient(s.x, s.y, s.x - Math.cos(s.angle) * s.length, s.y - Math.sin(s.angle) * s.length);
+                    grd.addColorStop(0, `rgba(255, 255, 255, ${s.life})`);
+                    grd.addColorStop(0.5, `rgba(0, 240, 255, ${s.life * 0.6})`);
+                    grd.addColorStop(1, 'transparent');
+                    ctx.strokeStyle = grd;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+            
+            function drawWaves(time) {
+                ctx.globalAlpha = 0.06;
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 2.5;
+                
+                const t = time * 0.0003;
+                // Waves also react slightly to mouse
+                const waveOffsetY = mouseY * 10;
+                
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    for (let x = 0; x <= width; x += 15) {
+                        const y = height * (0.58 + i * 0.1) + waveOffsetY + 
+                            Math.sin(x * 0.002 + t + i * 1.8) * 35 +
+                            Math.sin(x * 0.004 + t * 0.6) * 15;
+                        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+            }
+            
+            function animate(currentTime) {
+                const delta = currentTime - lastTime;
+                if (delta < 1000 / CONFIG.fps) {
+                    requestAnimationFrame(animate);
+                    return;
+                }
+                lastTime = currentTime - (delta % (1000 / CONFIG.fps));
+                
+                drawBackground(currentTime);
+                drawStars(currentTime);
+                drawNebula(currentTime);
+                drawAurora(currentTime);
+                drawOrbs(currentTime);
+                drawWaves(currentTime);
+                drawParticles(currentTime);
+                
+                spawnShootingStar();
+                drawShootingStars(currentTime);
+                
+                requestAnimationFrame(animate);
+            }
+            
+            window.addEventListener('resize', resize);
+            resize();
+            animate(0);
+        })();
+        const API_BASE = 'http://127.0.0.1:8001';
+        const PASS_THRESHOLD = 80;
+        
+        const SECTION_CONFIG = [
+            { start: 1, end: 10, time: 15, label: 'Section 1: Questions 1-10' },
+            { start: 11, end: 15, time: 20, label: 'Section 2: Questions 11-15' },
+            { start: 16, end: 20, time: 25, label: 'Section 3: Questions 16-20' }
+        ];
+
+        const state = {
+            user: { name: '', id: '', skill: '', experience: '' },
+            questions: [],
+            currentIndex: 0,
+            answers: {},
+            timer: null,
+            timeRemaining: 12,
+            totalTime: 12,
+            startTime: null,
+            attemptNumber: 1,
+            attemptsRemaining: 2,
+            loadingStep: 0
+        };
+
+        const SKILL_DATABASE = [
+            { short: 'aws', full: 'Amazon Web Services' },
+            { short: 'azure', full: 'Microsoft Azure' },
+            { short: 'gcp', full: 'Google Cloud Platform' },
+            { short: 'js', full: 'JavaScript' },
+            { short: 'ts', full: 'TypeScript' },
+            { short: 'py', full: 'Python' },
+            { short: 'ml', full: 'Machine Learning' },
+            { short: 'ai', full: 'Artificial Intelligence' },
+            { short: 'dl', full: 'Deep Learning' },
+            { short: 'ds', full: 'Data Science' },
+            { short: 'da', full: 'Data Analytics' },
+            { short: 'de', full: 'Data Engineering' },
+            { short: 'sql', full: 'SQL' },
+            { short: 'nosql', full: 'NoSQL Databases' },
+            { short: 'docker', full: 'Docker' },
+            { short: 'k8s', full: 'Kubernetes' },
+            { short: 'devops', full: 'DevOps' },
+            { short: 'ci/cd', full: 'CI/CD Pipelines' },
+            { short: 'react', full: 'React.js' },
+            { short: 'vue', full: 'Vue.js' },
+            { short: 'angular', full: 'Angular' },
+            { short: 'node', full: 'Node.js' },
+            { short: 'django', full: 'Django' },
+            { short: 'flask', full: 'Flask' },
+            { short: 'fastapi', full: 'FastAPI' },
+            { short: 'java', full: 'Java' },
+            { short: 'spring', full: 'Spring Framework' },
+            { short: 'go', full: 'Go (Golang)' },
+            { short: 'rust', full: 'Rust' },
+            { short: 'c++', full: 'C++' },
+            { short: 'c#', full: 'C# (.NET)' },
+            { short: 'php', full: 'PHP' },
+            { short: 'ruby', full: 'Ruby on Rails' },
+            { short: 'swift', full: 'Swift' },
+            { short: 'kotlin', full: 'Kotlin' },
+            { short: 'scala', full: 'Scala' },
+            { short: 'r', full: 'R Programming' },
+            { short: 'matlab', full: 'MATLAB' },
+            { short: 'saas', full: 'Software as a Service' },
+            { short: 'iaas', full: 'Infrastructure as a Service' },
+            { short: 'paas', full: 'Platform as a Service' },
+            { short: 'api', full: 'API Development' },
+            { short: 'rest', full: 'REST API' },
+            { short: 'graphql', full: 'GraphQL' },
+            { short: 'microservices', full: 'Microservices Architecture' },
+            { short: 'blockchain', full: 'Blockchain' },
+            { short: 'web3', full: 'Web3 Development' },
+            { short: 'solidity', full: 'Solidity' },
+            { short: 'cybersec', full: 'Cybersecurity' },
+            { short: 'penetration', full: 'Penetration Testing' },
+            { short: 'cloudsec', full: 'Cloud Security' },
+            { short: 'networking', full: 'Computer Networking' },
+            { short: 'linux', full: 'Linux' },
+            { short: 'unix', full: 'Unix' },
+            { short: 'shell', full: 'Shell Scripting' },
+            { short: 'aws ec2', full: 'AWS EC2' },
+            { short: 'aws s3', full: 'AWS S3' },
+            { short: 'aws lambda', full: 'AWS Lambda' },
+            { short: 'aws dynamodb', full: 'AWS DynamoDB' },
+            { short: 'aws rds', full: 'AWS RDS' },
+            { short: 'aws redshift', full: 'AWS Redshift' },
+            { short: 'aws ecs', full: 'AWS ECS/EKS' },
+            { short: 'azure vm', full: 'Azure Virtual Machines' },
+            { short: 'azure functions', full: 'Azure Functions' },
+            { short: 'azure storage', full: 'Azure Blob Storage' },
+            { short: 'gcp compute', full: 'GCP Compute Engine' },
+            { short: 'gcp functions', full: 'GCP Cloud Functions' },
+            { short: 'bigquery', full: 'Google BigQuery' },
+            { short: 'tableau', full: 'Tableau' },
+            { short: 'powerbi', full: 'Power BI' },
+            { short: 'excel', full: 'Microsoft Excel' },
+            { short: 'spark', full: 'Apache Spark' },
+            { short: 'hadoop', full: 'Hadoop' },
+            { short: 'hive', full: 'Apache Hive' },
+            { short: 'kafka', full: 'Apache Kafka' },
+            { short: 'airflow', full: 'Apache Airflow' },
+            { short: 'etl', full: 'ETL Processes' },
+            { short: 'aws glue', full: 'AWS Glue' },
+            { short: 'snowflake', full: 'Snowflake' },
+            { short: 'databricks', full: 'Databricks' },
+            { short: 'terraform', full: 'Terraform' },
+            { short: 'ansible', full: 'Ansible' },
+            { short: 'jenkins', full: 'Jenkins' },
+            { short: 'git', full: 'Git' },
+            { short: 'github', full: 'GitHub' },
+            { short: 'gitlab', full: 'GitLab' },
+            { short: 'agile', full: 'Agile Methodology' },
+            { short: 'scrum', full: 'Scrum' },
+            { short: 'jira', full: 'Jira' },
+            { short: 'qa', full: 'Quality Assurance' },
+            { short: 'selenium', full: 'Selenium' },
+            { short: 'cypress', full: 'Cypress' },
+            { short: 'postman', full: 'Postman API Testing' },
+            { short: 'jmeter', full: 'JMeter Load Testing' },
+            { short: 'prometheus', full: 'Prometheus' },
+            { short: 'grafana', full: 'Grafana' },
+            { short: 'elk', full: 'ELK Stack' },
+            { short: 'splunk', full: 'Splunk' },
+            { short: 'mobile', full: 'Mobile Development' },
+            { short: 'flutter', full: 'Flutter' },
+            { short: 'reactnative', full: 'React Native' },
+            { short: 'ios', full: 'iOS Development' },
+            { short: 'android', full: 'Android Development' },
+            { short: 'ui/ux', full: 'UI/UX Design' },
+            { short: 'figma', full: 'Figma' },
+            { short: 'sketch', full: 'Sketch' },
+            { short: 'adobe xd', full: 'Adobe XD' },
+            { short: 'figma', full: 'Figma' },
+            { short: 'html', full: 'HTML5' },
+            { short: 'css', full: 'CSS3' },
+            { short: 'sass', full: 'SASS/SCSS' },
+            { short: 'bootstrap', full: 'Bootstrap' },
+            { short: 'tailwind', full: 'Tailwind CSS' },
+            { short: 'webpack', full: 'Webpack' },
+            { short: 'vite', full: 'Vite' },
+            { short: 'mongodb', full: 'MongoDB' },
+            { short: 'redis', full: 'Redis' },
+            { short: 'postgres', full: 'PostgreSQL' },
+            { short: 'mysql', full: 'MySQL' },
+            { short: 'oracle', full: 'Oracle Database' },
+            { short: 'graphql', full: 'GraphQL' },
+            { short: 'grpc', full: 'gRPC' },
+            { short: 'rabbitmq', full: 'RabbitMQ' },
+            { short: 'pytorch', full: 'PyTorch' },
+            { short: 'tensorflow', full: 'TensorFlow' },
+            { short: 'keras', full: 'Keras' },
+            { short: 'nlp', full: 'Natural Language Processing' },
+            { short: 'cv', full: 'Computer Vision' },
+            { short: 'ocr', full: 'Optical Character Recognition' },
+            { short: 'llm', full: 'Large Language Models' },
+            { short: 'gpt', full: 'GPT Models' },
+            { short: 'bert', full: 'BERT' },
+            { short: 'openai', full: 'OpenAI API' },
+            { short: 'huggingface', full: 'Hugging Face' },
+            { short: 'langchain', full: 'LangChain' },
+            { short: 'vector db', full: 'Vector Databases' },
+            { short: 'pinecone', full: 'Pinecone' },
+            { short: 'weaviate', full: 'Weaviate' },
+            { short: 'chatgpt', full: 'ChatGPT Integration' },
+            { short: 'prompt engineering', full: 'Prompt Engineering' }
+        ];
+
+        function getSkillSuggestions(query) {
+            if (!query || query.length < 1) return [];
+            
+            const lowerQuery = query.toLowerCase().trim();
+            const suggestions = [];
+            const seen = new Set();
+            
+            for (const skill of SKILL_DATABASE) {
+                if (suggestions.length >= 8) break;
+                
+                const shortLower = skill.short.toLowerCase();
+                const fullLower = skill.full.toLowerCase();
+                const key = skill.full.toLowerCase();
+                
+                if (seen.has(key)) continue;
+                
+                let matchType = null;
+                
+                if (shortLower === lowerQuery || fullLower === lowerQuery) {
+                    matchType = 'exact';
+                } else if (shortLower.startsWith(lowerQuery) || fullLower.startsWith(lowerQuery)) {
+                    matchType = 'prefix';
+                } else if (shortLower.includes(lowerQuery) || fullLower.includes(lowerQuery)) {
+                    matchType = 'partial';
+                }
+                
+                if (matchType) {
+                    seen.add(key);
+                    suggestions.push({ ...skill, matchType });
+                }
+            }
+            
+            if (suggestions.length === 0 && lowerQuery.length >= 2) {
+                for (const skill of SKILL_DATABASE) {
+                    if (suggestions.length >= 5) break;
+                    if (seen.has(skill.full.toLowerCase())) continue;
+                    
+                    const shortWords = skill.short.split(' ');
+                    for (const word of shortWords) {
+                        if (word.startsWith(lowerQuery.substring(0, 2))) {
+                            seen.add(skill.full.toLowerCase());
+                            suggestions.push({ ...skill, matchType: 'word' });
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            return suggestions;
+        }
+
+        function renderSkillSuggestions(suggestions) {
+            const container = document.getElementById('skillSuggestions');
+            container.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                container.classList.remove('active');
+                return;
+            }
+            
+            suggestions.forEach(skill => {
+                const item = document.createElement('div');
+                item.className = 'skill-suggestion-item';
+                
+                let label = skill.matchType === 'exact' ? 'Exact Match' : 
+                           skill.matchType === 'prefix' ? 'Prefix Match' : 
+                           skill.matchType === 'word' ? 'Word Match' : 'Related';
+                
+                item.innerHTML = `
+                    <div>
+                        <div class="skill-name">${skill.full}</div>
+                        <div class="skill-fullname">${skill.short}</div>
+                    </div>
+                    <span class="match-type ${skill.matchType}">${label}</span>
+                `;
+                
+                item.addEventListener('click', () => {
+                    document.getElementById('skillInput').value = skill.full;
+                    container.classList.remove('active');
+                });
+                
+                container.appendChild(item);
+            });
+            
+            container.classList.add('active');
+        }
+
+        function initSkillSearch() {
+            const skillInput = document.getElementById('skillInput');
+            const suggestionsContainer = document.getElementById('skillSuggestions');
+            let selectedIndex = -1;
+            
+            skillInput.addEventListener('input', (e) => {
+                const query = e.target.value;
+                const suggestions = getSkillSuggestions(query);
+                renderSkillSuggestions(suggestions);
+                selectedIndex = -1;
+            });
+            
+            skillInput.addEventListener('focus', (e) => {
+                const query = e.target.value;
+                const suggestions = getSkillSuggestions(query);
+                renderSkillSuggestions(suggestions);
+            });
+            
+            skillInput.addEventListener('keydown', (e) => {
+                const container = document.getElementById('skillSuggestions');
+                const items = container.querySelectorAll('.skill-suggestion-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (!container.classList.contains('active')) {
+                        const suggestions = getSkillSuggestions(skillInput.value);
+                        renderSkillSuggestions(suggestions);
+                    }
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateSelection(items, selectedIndex);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, 0);
+                    updateSelection(items, selectedIndex);
+                } else if (e.key === 'Enter') {
+                    if (selectedIndex >= 0 && items[selectedIndex]) {
+                        e.preventDefault();
+                        items[selectedIndex].click();
+                    }
+                } else if (e.key === 'Escape') {
+                    container.classList.remove('active');
+                    selectedIndex = -1;
+                } else if (e.key === 'Tab' && container.classList.contains('active')) {
+                    container.classList.remove('active');
+                    selectedIndex = -1;
+                }
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.form-group')) {
+                    suggestionsContainer.classList.remove('active');
+                    selectedIndex = -1;
+                }
+            });
+            
+            function updateSelection(items, index) {
+                items.forEach((item, i) => {
+                    item.style.background = i === index ? 'rgba(0, 240, 255, 0.2)' : '';
+                });
+            }
+        }
+
+        const loadingSteps = [
+            { status: 'Connecting to server...', subtext: 'Establishing secure connection' },
+            { status: 'Analyzing your profile...', subtext: 'Accessing Skill and Experience ' },
+            { status: 'Generating assessment...', subtext: 'Creating personalized questions powered by AI' },
+            { status: 'Finalizing questions...', subtext: 'Preparing your challenge' }
+        ];
+
+        let loadingAnimation = null;
+
+        function getLoadingSteps() {
+            return loadingSteps;
+        }
+
+        const FALLBACK_QUESTIONS = {
+            Python: [
+                { id: 1, question: "In a Python async/await system processing 10K concurrent requests, you notice memory growing linearly despite gc.collect() calls. The asyncio event loop uses a defaultdict for tracking pending tasks. What's the MOST LIKELY cause?", options: ["A. Event loop accumulating completed tasks in internal queues without explicit cleanup", "B. GIL contention causing delayed garbage collection", "C. Circular references in task callbacks preventing collection", "D. Default dict's auto-vivification creating memory leaks"], correct: "A", explanation: "Async event loops keep completed futures in internal queues. Without explicit await or explicitly calling future.result(), these accumulate. gc.collect() won't help because references are still held internally." },
+                { id: 2, question: "You're using multiprocessing.Pool with 8 workers to process 1M records. After 2 hours, you observe OOM kills despite each record being only ~1KB. Worker processes show RSS of 2GB each. What's happening?", options: ["A. Pool's default chunksize causing massive memory copies between processes", "B. Serialized data (pickle) overhead multiplying memory by 10x per record", "C. Pool not properly closing, causing file descriptor leaks", "D. Shared memory arrays not being garbage collected"], correct: "B", explanation: "Each record gets pickled when sent to worker and unpickled in worker. 1KB record becomes ~10KB+ with pickle overhead. 1M records * 8 workers = massive memory explosion." },
+                { id: 3, question: "Your Django app uses select_related on a ForeignKey chain: Order -> Customer -> Profile -> Settings. The query appears simple but EXPLAIN shows nested loop scans. What's wrong?", options: ["A. ForeignKey without db_index causing full table scans", "B. select_related doesn't follow reverse ForeignKeys (related_name)", "C. PostgreSQL's optimizer choosing nested loop for small tables", "D. Abstract base class inheritance breaking select_related"], correct: "B", explanation: "select_related only follows ForeignKey and OneToOne forward relations. It cannot traverse reverse ForeignKeys (those with related_name) or ManyToMany fields." },
+                { id: 4, question: "You're implementing a rate limiter using Redis INCR with TTL. In production, you observe occasional allowences of 2x the limit during Redis failovers. What's causing this?", options: ["A. Redis replication lag allowing stale reads on failover", "B. INCR not being atomic across Redis Cluster", "C. TTL reset not being atomic with INCR", "D. Pipeline execution creating race conditions"], correct: "C", explanation: "When key expires and is re-created, the INCR and EXPIRE are not atomic. Under failovers or high concurrency, the window between INCR and EXPIRE allows extra increments." },
+                { id: 5, question: "Your Python service using threading.Lock() for synchronization occasionally deadlocks under high load. You're certain no code path holds lock without releasing. What subtle issue is likely?", options: ["A. Signal handlers interrupting lock acquisition", "B. Context switch during lock.__enter__() creating invisible critical sections", "C. Thread pool reuse causing stale lock state", "D. GC collection of lock object mid-operation"], correct: "A", explanation: "If signal handler acquires the same lock (even indirectly through logging or syscalls), it creates priority inversion. The main thread holds lock, signal arrives, handler tries to acquire - deadlock." },
+                { id: 6, question: "Using Celery with Redis broker, you notice tasks occasionally executing twice despite task_acks_late=True. The task itself is idempotent. What's the root cause?", options: ["A. Worker pre-fetch multiplier > 1 causing duplicate reservations", "B. Redis pub/sub message duplication during network blips", "C. Task timeout and retry creating race conditions", "D. Worker process crash mid-execution not properly detected"], correct: "A", explanation: "prefetch_multiplier allows a worker to reserve multiple tasks. If worker crashes, all prefetched tasks are lost. Set prefetch_multiplier=1 for exactly-once semantics." },
+                { id: 7, question: "Your Flask app with SQLAlchemy shows db connection exhaustion under 1000 RPS. You've configured pool_size=20, max_overflow=10. The /health endpoint just does SELECT 1. What's happening?", options: ["A. Health check not using session.close() leaking connections", "B. Flask-SQLAlchemy scope mismatch with Flask request lifecycle", "C. Long-running transactions holding connections unnecessarily", "D. All of the above combined"], correct: "D", explanation: "All three issues compound: health checks leak, sessions don't match request lifecycle, and code holds transactions too long. Combined, 1000 RPS quickly exhausts 30 connections." },
+                { id: 8, question: "Implementing a distributed lock with Redis SET NX EX, you use a UUID as value to detect stale locks. Another service incorrectly acquires the same lock. What's wrong?", options: ["A. UUID comparison not atomic - should use GET then SET", "B. Lua script has race condition between check and set", "C. System clock drift causing UUID collisions", "D. Another service using same lock name but different UUID format"], correct: "B", explanation: "Without Lua script, the check-if-exists and set-if-not-exists are two separate commands. Another process can SET between your GET and your SET, both passing the check." },
+                { id: 9, question: "Your async Python code using aiohttp shows 100% CPU on one core despite mostly waiting for I/O. The code uses asyncio.gather() for 1000 concurrent requests. What's happening?", options: ["A. asyncio event loop single-threaded nature saturating one core", "B. DNS resolution blocking in aiohttp resolver", "C. JSON parsing during response handling", "D. All of the above can cause this"], correct: "D", explanation: "All three contribute: event loop is single-threaded (expected), DNS can be sync blocking, and large JSON payloads need CPU for parsing. For 50ms inference with 500ms total, likely making individual requests instead of batching." },
+                { id: 10, question: "Using Python's dataclasses with slots=True for memory efficiency, you observe that instances still have __dict__ and memory isn't reduced. What did you miss?", options: ["A. slots=True only works with frozen=True", "B. Inheritance from another class breaks slots", "C. Using field(default_factory=...) creates __dict__", "D. All of the above can prevent slots from working"], correct: "D", explanation: "slots require: no __dict__, no __slots__ in parent classes, and no non-default fields with default_factory. Any of these break the memory optimization." },
+                { id: 11, question: "Your ML pipeline in Python loads a 10GB model for inference. Each inference takes 50ms but you're seeing 500ms. Model is on GPU. What's the bottleneck?", options: ["A. CPU->GPU data transfer overhead for each request", "B. Python GIL preventing parallel batch processing", "C. Serialization overhead of input tensors", "D. All of the above are likely contributors"], correct: "D", explanation: "Python GIL, CPU-GPU transfer (can be 10ms+ each way), and serialization all add latency. For 50ms inference with 500ms total, likely making individual requests instead of batching." },
+                { id: 12, question: "Implementing WebSocket in Python, you use a global set to track connected clients. Under 10K connections, memory explodes. Each client object is tiny. What's wrong?", options: ["A. WebSocket connections not being properly closed, accumulating", "B. Set overhead per connection is actually ~500 bytes not 8 bytes", "C. asyncio's internal buffers per connection are large", "D. All of the above contribute"], correct: "D", explanation: "Each asyncio connection has read/write buffers (default 64KB each), plus the set object overhead, plus any per-connection state. 10K connections easily becomes several GB." },
+                { id: 13, question: "Your service uses @lru_cache on an expensive function. First call is slow, subsequent calls are fast. But after 1 hour, performance degrades gradually. What's happening?", options: ["A. Cache eviction policy not suitable for time-series data", "B. Arguments to function creating new objects each call, cache miss", "C. Memory pressure causing Python to clear part of cache", "D. Cache not thread-safe causing corruption"], correct: "B", explanation: "If calling code creates new objects each time (e.g., datetime.now(), new lists), the cache key is different each call. Cache grows unbounded, hit rate drops to near zero." },
+                { id: 14, question: "Using pydantic for validation, you notice 10x slowdown when upgrading from v1 to v2 for a model with 100 fields. What's the most likely cause?", options: ["A. New validation features are slower by design", "B. v2's stricter validation runs more checks", "C. Import-time configuration differences", "D. Breaking change in field ordering"], correct: "B", explanation: "Pydantic v2 is rewritten in Rust but runs more comprehensive validation by default. Use model_config = {'strict': False} to match v1 performance." },
+                { id: 15, question: "Your Python ETL pipeline using pandas processes 100GB CSV files. It's running for 30+ hours. You have 64GB RAM. What's the optimization strategy?", options: ["A. Use chunked reading with pd.read_csv(chunksize=)", "B. Use dtypes specification to reduce memory by 50%", "C. Use Polars instead of pandas - 10x faster", "D. All of the above combined"], correct: "D", explanation: "Chunked reading prevents OOM, dtype specification reduces memory 50%+, Polars is 10x faster than pandas. All three together can reduce 30h to under 1h." },
+                { id: 16, question: "Implementing retry logic with exponential backoff, you notice some requests never retry despite failures. Using try/except with broad Exception catch. What's wrong?", options: ["A. NetworkTimeout exceptions not subclass of Exception in some libs", "B. AlreadyRetriedException explicitly stops propagation", "C. Generator-based function exhausted, not raising exception", "D. ThreadPoolExecutor swallowing exceptions"], correct: "C", explanation: "If the function is a generator (has yield), calling it returns a generator object, not executing the code. Need to iterate the generator or use @types.coroutine." },
+                { id: 17, question: "PRODUCTION INCIDENT: At 2AM, your Python payment service starts returning 200 OK but no money is transferred. Logs show successful processing. Investigation reveals:", options: ["A. Database transaction not committed - auto-commit disabled", "B. Payment provider API returning success without processing", "C. Webhook delivery delayed by 6 hours", "D. A and B combined most likely"], correct: "D", explanation: "Without explicit commit(), transactions may not commit depending on session config. Payment providers may return 'pending' as success initially. Both create silent failures." },
+                { id: 18, question: "PRODUCTION INCIDENT: p99 latency spiked from 50ms to 5000ms for 30 minutes. Your Python async service handles 10K requests/sec. Investigation shows:", options: ["A. Redis connection pool exhausted - all requests waiting in queue", "B. Database connection pool same issue", "C. Cloud function cold start", "D. All of the above can cause this"], correct: "D", explanation: "Connection pool exhaustion (Redis or DB) causes request queuing, increasing latency dramatically. Cloud functions can also cold start. Need connection pooling, timeouts, and circuit breakers." },
+                { id: 19, question: "PRODUCTION INCIDENT: Users report seeing OTHER USER'S DATA. Your Python service has multi-tenancy with shared database. What's the vulnerability?", options: ["A. SQL injection allowing data access", "B. Cached queries not invalidated between users", "C. Global variable storing user context incorrectly", "D. All of the above are possible"], correct: "D", explanation: "All three are dangerous: SQL injection bypasses all access control, cached queries leak between requests, global state from previous request is catastrophic in multi-threaded services." },
+                { id: 20, question: "PRODUCTION INCIDENT: Your ML model suddenly started approving ALL loans, causing $10M in losses before detection. Model was in production 6 months. What happened?", options: ["A. Training data drift - bad loans now look like good loans", "B. Feature pipeline bug causing all features to become zeros", "C. Model serialization corruption", "D. All are plausible - need investigation"], correct: "D", explanation: "Data drift happens gradually, feature pipeline bugs can cause silent failures (0s often pass validation), serialization corruption is rare but possible. All require monitoring and alerts." }
+            ],
+            JavaScript: [
+                { id: 1, question: "Your Node.js service shows memory growing indefinitely under sustained load. You use async/await throughout. Heap snapshots show Buffer objects accumulating. What's wrong?", options: ["A. Response buffers not being garbage collected after sending", "B. Event listener accumulation on EventEmitter", "C. Promise rejection not handled causing memory leak", "D. All of the above can cause this"], correct: "D", explanation: "Buffers from HTTP responses need explicit handling, EventEmitters accumulate listeners if not removed, and unhandled Promise rejections keep associated data in memory." },
+                { id: 2, question: "Using React useEffect with empty dependency array [], you notice the effect runs multiple times in development. In production build it runs once. What's actually happening?", options: ["A. React StrictMode double-invokes in development only", "B. Hot module replacement re-running effects", "C. React DevTools causing additional renders", "D. None - empty array always runs once in production"], correct: "A", explanation: "React StrictMode intentionally double-invokes effects in development to detect side effects without proper cleanup. This doesn't happen in production builds." },
+                { id: 3, question: "Your Express.js middleware logs 'Cannot set headers after they are sent to client' error intermittently. The middleware definitely runs before response is sent. What's happening?", options: ["A. Another middleware modifying response after yours", "B. Async middleware not awaiting, causing race condition", "C. Error handler running after response sent", "D. All of the above possible"], correct: "D", explanation: "Express middleware chain continues even after response sent. Async middleware that doesn't await can cause race conditions. Error handlers can also trigger after response." },
+                { id: 4, question: "Using Vue 3 Composition API, you notice computed properties recalculating on every render despite dependencies not changing. What's likely?", options: ["A. Returning new object reference from computed", "B. Using reactive() instead of shallowReactive()", "C. Component re-rendering unnecessarily", "D. A and C combined"], correct: "A", explanation: "Computed properties use === for dependency tracking. If you return a new object each time (e.g., { ...state }), Vue thinks dependency changed every render." },
+                { id: 5, question: "Your Node.js Express app using Node's crypto module shows 100% CPU every 24 hours for 30 seconds. What's happening?", options: ["A. Garbage collection pause", "B. Internal crypto entropy gathering", "C. TLS session ticket renewal", "D. Event loop starvation from long-running operations"], correct: "B", explanation: "Node's crypto module blocks when gathering entropy for random number generation. This can cause visible CPU spikes, typically during heavy cryptographic operations." },
+                { id: 6, question: "Using WebSocket in browser, you notice messages arriving with 100ms delay even locally. Server sends immediately. What's causing this?", options: ["A. TCP Nagle's algorithm delaying small packets", "B. Browser render cycle batching messages", "C. WebSocket implementation buffering", "D. A and B combined"], correct: "D", explanation: "Nagle's algorithm buffers small packets to reduce network overhead. Browser rendering also batches. Use socket.binaryType = 'arraybuffer' and consider disabling Nagle." },
+                { id: 7, question: "Your React app shows 'Maximum update depth exceeded' error. You definitely have correct dependency arrays. What's likely?", options: ["A. State update triggering effect that updates same state", "B. Context value changing causing infinite re-render", "C. Reducer dispatching action that triggers itself", "D. All can cause this"], correct: "D", explanation: "This error means setState was called too many times. Any circular dependency between state, effects, or context can cause this." },
+                { id: 8, question: "Using Promise.all() to run 100 requests in parallel, you see only 6 concurrent in network tab. What's limiting concurrency?", options: ["A. Browser HTTP/1.1 limit of 6 connections per domain", "B. Node.js default http.Agent maxSockets", "C. Cloud provider rate limiting", "D. A and B combined"], correct: "D", explanation: "Browsers limit to 6 concurrent connections per domain (HTTP/1.1). Node.js also has default limits. Use different domains, HTTP/2, or implement custom concurrency control." },
+                { id: 9, question: "Your Next.js app with getStaticProps shows stale data despite revalidate=60. Data changes but pages show old version. What's happening?", options: ["A. Stale-while-revalidate only on next request, not immediate", "B. CDN caching overriding your revalidate", "C. Build-time data fetching overriding runtime", "D. A and B combined likely"], correct: "D", explanation: "SWR updates in background on next request, not immediately. CDNs can also cache aggressively. Use on-demand ISR (revalidatePath) or client-side fetching for freshness." },
+                { id: 10, question: "Using TypeScript with strict: true, you get 'Expression is too error' on a complex generic. The code is correct but won't compile. What's the fix?", options: ["A. TypeScript hitting recursion depth limit in type inference", "B. Too many generic constraints causing inference explosion", "C. Use explicit type annotations instead of inference", "D. All of the above can help"], correct: "D", explanation: "Complex generics can exceed TypeScript's inference depth. Add explicit type parameters, simplify constraints, or use type assertions (carefully) to work around." },
+                { id: 11, question: "Your Electron app shows 100% CPU when minimized. When maximized it uses normal CPU. What's happening?", options: ["A. RequestAnimationFrame continues running when minimized", "B. GPU process still running full speed", "C. Event loop not being throttled by Chromium", "D. All can cause this"], correct: "A", explanation: "requestAnimationFrame continues when window is minimized but not hidden. Use Page Visibility API to pause animations and heavy computations when tab/window is not visible." },
+                { id: 12, question: "Using Redux with createSlice, you notice state mutations happening despite immer enabled. What's wrong?", options: ["A. Using direct assignment instead of draft.", "B. Immer not enabled in store config", "C. Mutating state in reducers before returning", "D. A and C most likely"], correct: "A", explanation: "Even with Immer, you must use 'return produce(draft, ... )' or 'draft.x = y' pattern. Direct state.x = y outside of produce() still mutates." },
+                { id: 13, question: "Your Node.js streams pipeline fails silently - no error, no data. You're using pipeline() with async await. What's wrong?", options: ["A. pipeline doesn't throw, must use callback or event", "B. Stream not being consumed (no .pipe() or for await)", "C. Backpressure not handled, buffer overflow", "D. A and B likely"], correct: "A", explanation: "pipeline() returns a Promise that rejects on error, BUT only if you await it or handle the callback. If you just call pipeline() without awaiting, errors are silently lost." },
+                { id: 14, question: "Your JavaScript date handling using new Date() works in dev but is wrong by hours in production across timezones. What's wrong?", options: ["A. Server returning UTC, client treating as local", "B. DST transitions causing off-by-one errors", "C. JavaScript Date not handling IANA timezone strings", "D. A and B most likely"], correct: "D", explanation: "Date handling across timezones is notoriously tricky. Always use ISO 8601 strings (UTC), explicitly store timezone, and use libraries like date-fns-tz or Luxon." },
+                { id: 15, question: "Your Node.js HTTP server accepts requests but never responds. Requests hang indefinitely. Most likely cause?", options: ["A. Missing response.end() call", "B. Event emitter memory leak causing event queue backup", "C. DNS resolution hanging", "D. All can cause this"], correct: "A", explanation: "HTTP server in Node requires explicit response.end(). Without it, response never completes. Check all code paths have response.end() or response.send()." },
+                { id: 16, question: "Your React memoized component still re-renders when parent re-renders. You used React.memo correctly. What's wrong?", options: ["A. Context provider value is new object each render", "B. Parent passing new function reference", "C. Props contain non-serializable data", "D. All can cause this"], correct: "D", explanation: "React.memo does shallow comparison. New object for context, new function for callback, or any non-primitive prop causes re-render. Use useMemo/useCallback for stable references." },
+                { id: 17, question: "PRODUCTION INCIDENT: Users report authentication errors after 30 min. JWT tokens are set to expire in 24h. Investigation reveals:", options: ["A. Server clock skew causing token validation failure", "B. Refresh token being revoked incorrectly", "C. Load balancer cookie persistence issue", "D. A and B most likely"], correct: "D", explanation: "JWT validation fails if server clock differs significantly from client. Refresh tokens can also be incorrectly revoked due to timing issues. Check NTP sync and token revocation logic." },
+                { id: 18, question: "PRODUCTION INCIDENT: JavaScript heap memory grew from 100MB to 2GB in 10 minutes, then process crashed. Investigation shows:", options: ["A. Event listeners not being removed causing accumulation", "B. Closure capturing large objects incorrectly", "C. Circular references preventing GC", "D. All can cause this"], correct: "D", explanation: "Memory leaks in Node.js: listeners accumulate if not removed, closures can capture entire scope incorrectly, and circular refs prevent GC. Heap snapshots needed to identify." },
+                { id: 19, question: "PRODUCTION INCIDENT: Your API returns correct data but frontend shows nothing. No console errors. Network shows 200 OK with correct JSON. What's wrong?", options: ["A. JSON.parse failing silently due to BOM or invalid UTF-8", "B. Frontend expecting different data structure", "C. CORS preflight not returning correct headers", "D. All possible"], correct: "D", explanation: "Silent failures: JSON may parse but not match expected shape, CORS may allow GET but not POST, or BOM characters may corrupt parsing. Add error handling and logging." },
+                { id: 20, question: "PRODUCTION INCIDENT: WebSocket connections drop every exactly 60 seconds. Server sends ping/pong. What's the root cause?", options: ["A. Load balancer idle timeout killing connections", "B. Browser throttling background tabs", "C. Cloud provider proxy timeout", "D. All likely - check infrastructure config"], correct: "D", explanation: "Load balancers (AWS ALB=60s default), cloud proxies, and browsers all have idle timeouts. Send application-level keepalives more frequently than infrastructure timeouts." }
+            ],
+            default: [
+                { id: 1, question: "You implement a distributed lock using Redis SET NX with 30s expiration. Under high load, multiple services acquire the same lock simultaneously. What's wrong?", options: ["A. SET NX not atomic - need Lua script", "B. Clock skew between servers causing TTL issues", "C. Redis replication lag allowing stale reads", "D. All can cause this"], correct: "D", explanation: "Without atomic SET+EXPIRE, race conditions occur. Clock skew makes TTL unreliable. Replication lag means master and replica can have different state. Use single Lua script." },
+                { id: 2, question: "Your microservices communicate via REST. Under 10K RPS, latency spikes to 5 seconds. You have 20 instances. What's the bottleneck?", options: ["A. HTTP/1.1 connection limit per host (6)", "B. Each service instance can handle limited concurrent connections", "C. Circuit breaker not implemented, cascading failures", "D. All contribute"], correct: "D", explanation: "HTTP/1.1 limits concurrency per host. Each instance has connection pool limits. Without circuit breakers, one slow service blocks others." },
+                { id: 3, question: "Using database connection pooling with pool_size=10, you get 'connection pool exhausted' at 100 RPS. Each request needs one query. What's wrong?", options: ["A. Connections not being returned to pool after query", "B. Long-running queries holding connections too long", "C. Too few connections for workload", "D. All likely"], correct: "D", explanation: "Connection leaks (not closing), long transactions (not returning quickly), and undersized pool all cause exhaustion. Need proper connection lifecycle and pool sizing." },
+                { id: 4, question: "Your Kubernetes pod keeps crashing with OOMKilled. Memory limit is 512MB. App shows heap usage of 200MB in logs. What's happening?", options: ["A. Container memory accounting includes stack, not just heap", "B. Off-heap memory (buffers, caches) using extra memory", "C. Memory limits include memory-mapped files", "D. All can cause OOM despite low heap"], correct: "D", explanation: "Container memory = heap + stack + buffers + mmap + GC overhead. 200MB heap can easily exceed 512MB limit. Need proper memory limits and monitoring." },
+                { id: 5, question: "Implementing circuit breaker, you notice it never trips despite 90% failure rate. Configuration: threshold=5, timeout=60s. What's wrong?", options: ["A. Success threshold not configured - defaults to infinite", "B. Timeout is for half-open, not failure detection", "C. Exception not being counted as failure", "D. All can prevent circuit breaking"], correct: "D", explanation: "Circuit breakers need: failure threshold (for opening), success threshold (for closing), timeout values, and what counts as failure. Misconfiguration renders it useless." },
+                { id: 6, question: "Your API Gateway Lambda function times out at 30 seconds. Actual processing takes 10 seconds. What's happening?", options: ["A. Cold start taking 20+ seconds", "B. Lambda lifecycle killing function mid-request", "C. Downstream service taking time to respond", "D. All possible"], correct: "D", explanation: "Cold starts can take 20+ seconds for large runtimes. Lambda can be recycled mid-request. Downstream services may be slow. Add cold start metrics and optimize function." },
+                { id: 7, question: "Using Kafka consumer, messages accumulate - consumer is running but not processing. What's wrong?", options: ["A. poll() not being called in loop", "B. Consumer group rebalancing causing stalls", "C. Offset commit synchronous, blocking progress", "D. All can cause this"], correct: "D", explanation: "Kafka consumers must poll() repeatedly. Rebalances pause consumption. Synchronous offset commits block. Need async commits and proper poll loop." },
+                { id: 8, question: "Your Grafana dashboard shows Prometheus queries timing out. Queries that work alone fail when combined. What's happening?", options: ["A. Too many time series being queried", "B. Prometheus server resource constraints", "C. Queries not using appropriate recording rules", "D. All cause timeout issues"], correct: "D", explanation: "High cardinality metrics, limited server resources, and complex queries without recording rules all cause timeouts." },
+                { id: 9, question: "Implementing OAuth2, refresh tokens stop working after first use. You implement token rotation. What's actually happening?", options: ["A. Refresh tokens are single-use by design in OAuth2.1", "B. Server bug invalidating tokens incorrectly", "C. Client not properly storing new refresh token", "D. All are possible"], correct: "A", explanation: "OAuth 2.1 makes refresh tokens single-use for security. Each refresh returns new access AND refresh token. Old one is invalidated." },
+                { id: 10, question: "Your ELK stack logs show gaps - some time periods have no logs. Shipper is running. What's wrong?", options: ["A. Log rotation deleting files before shipping", "B. Backpressure when Elasticsearch is slow", "C. Network drops during high volume", "D. All can cause log gaps"], correct: "D", explanation: "Files can rotate before Filebeat processes them. Elasticsearch backpressure can cause buffering failures. Network issues can drop batches." },
+                { id: 11, question: "Using Kubernetes HPA, you notice it scales too late - pods already overloaded. Scale-up takes 3 minutes. How to fix?", options: ["A. HPA defaults are conservative - tune sync period", "B. Use VPA instead of HPA for faster response", "C. Add custom metrics for predictive scaling", "D. A and C combined"], correct: "D", explanation: "HPA has default 15s sync period but metrics collection takes time. Tune sync period, use custom metrics, and consider VPA or KEDA." },
+                { id: 12, question: "Your CI/CD pipeline builds take 30 minutes. You parallelize tests but overall time unchanged. What's the bottleneck?", options: ["A. Sequential stages in pipeline", "B. Shared resources causing test isolation issues", "C. Artifact upload/download taking most time", "D. All contribute"], correct: "D", explanation: "Sequential stages limit parallelism. Shared test databases cause contention. Large artifacts slow transfer." },
+                { id: 13, question: "Implementing WebSocket in Kubernetes, connections drop during deployment. Users reconnect constantly. What's missing?", options: ["A. Graceful termination not accounting for connections", "B. No sticky sessions", "C. Readiness probe failing during deployment", "D. All can cause this"], correct: "D", explanation: "Graceful shutdown needs time for connections to drain. Sticky sessions ensure clients reconnect to same pod. Readiness probes must not fail during rolling updates." },
+                { id: 14, question: "Your service mesh shows 50% requests take 10ms, 50% take 500ms. Same endpoint, same payload. What's causing bimodal latency?", options: ["A. Cold start in serverless/container", "B. Connection pool warm vs cold", "C. Cache miss vs hit routing", "D. All can cause bimodal distribution"], correct: "D", explanation: "Cold starts affect first requests. Pool warmup takes time. Cache routing can split traffic. Need to identify which factor is dominant." },
+                { id: 15, question: "Using etcd for distributed config, reads are slow (100ms) but writes fast (5ms). Single etcd cluster. What's happening?", options: ["A. Stale reads from follower", "B. Network latency to etcd cluster", "C. Quorum read requiring majority acknowledgement", "D. C is most likely in majority-ack cluster"], correct: "C", explanation: "etcd uses Raft consensus - even reads require quorum in default config. Use read-replicas or disable linearizability for speed." },
+                { id: 16, question: "Your monitoring shows 1% error rate but SLO target is 99.9%. Alert fires incorrectly. What's wrong with SLO calculation?", options: ["A. Not using error budget - using rolling window instead", "B. Alert based on instant rate, not sustained error", "C. Not accounting for maintenance windows", "D. All can cause false alerts"], correct: "D", explanation: "SLO is error budget remaining, not instant error rate. Alerts should be on burn rate or budget remaining. Many misconfigure SLOs." },
+                { id: 17, question: "PRODUCTION INCIDENT: Database primary fails. Automated failover takes 5 minutes. RTO target was 30 seconds. Investigation shows:", options: ["A. Health check not detecting primary failure quickly", "B. Failover script has sequential steps that can't parallelize", "C. DNS/load balancer TTL too high", "D. All likely contributors"], correct: "D", explanation: "Failover needs fast detection, quick switchover (parallel DNS updates), and low TTLs. Each second of delay multiplies impact." },
+                { id: 18, question: "PRODUCTION INCIDENT: Cache (Redis) becomes unresponsive. All database queries hit primary DB. System crawls. What happened?", options: ["A. Redis OOM - eviction policy not configured", "B. Connection pool exhaustion", "C. Network partition isolating Redis", "D. All can cause cache unavailability"], correct: "D", explanation: "Redis OOM causes evictions or errors. Connection exhaustion stops new requests. Network partition makes Redis invisible." },
+                { id: 19, question: "PRODUCTION INCIDENT: Data corruption discovered - records have wrong values but no errors logged. App runs 6 months undetected. Root cause?", options: ["A. Race condition in read-modify-write", "B. Silent type coercion / overflow", "C. Application bug corrupting in-memory data", "D. All are silent failure modes"], correct: "D", explanation: "Silent corruption is worst kind. Race conditions, type issues, and in-memory bugs don't crash but produce wrong data." },
+                { id: 20, question: "PRODUCTION INCIDENT: New deployment causes 100% error rate. Rollback takes 30 minutes. Each deployment takes 1 hour. What went wrong?", options: ["A. No canary/percentage rollout", "B. Rollback requires manual process", "C. Long deployment pipeline not parallelized", "D. All compound to long MTTR"], correct: "D", explanation: "Need progressive rollouts (canary), automated rollbacks, and parallel pipeline stages. 30-minute rollback is unacceptable." }
+            ]
+        };
+
+        function loadFallbackQuestions() {
+            console.log('Loading fallback questions for skill:', state.user.skill);
+            const skillInput = (state.user.skill || '').toLowerCase().trim();
+            let questions = null;
+            
+            const skillMap = {
+                'python': 'Python',
+                'javascript': 'JavaScript', 
+                'js': 'JavaScript',
+                'java': 'Java',
+                'data science': 'Data Science',
+                'datascience': 'Data Science',
+                'machine learning': 'Machine Learning',
+                'ml': 'Machine Learning',
+                'devops': 'DevOps',
+                'cloud computing': 'Cloud Computing',
+                'cloud': 'Cloud Computing',
+                'database': 'Database',
+                'db': 'Database',
+                'react': 'JavaScript',
+                'angular': 'JavaScript',
+                'vue': 'JavaScript',
+                'node': 'JavaScript',
+                'nodejs': 'JavaScript',
+                'go': 'JavaScript',
+                'rust': 'JavaScript',
+                'aws': 'DevOps',
+                'azure': 'DevOps',
+                'gcp': 'DevOps',
+                'docker': 'DevOps',
+                'kubernetes': 'DevOps',
+                'k8s': 'DevOps',
+                'sql': 'Database'
+            };
+            
+            const matchedKey = skillMap[skillInput];
+            if (matchedKey && FALLBACK_QUESTIONS[matchedKey]) {
+                questions = FALLBACK_QUESTIONS[matchedKey];
+            } else {
+                questions = FALLBACK_QUESTIONS.default;
+            }
+            
+            state.questions = questions;
+            stopLoadingAnimation();
+            updateLoadingStep(2);
+            setTimeout(() => {
+                startQuiz();
+            }, 500);
+        }
+        
+        function startLoadingAnimation() {
+            state.loadingStep = 0;
+            const steps = getLoadingSteps();
+            updateLoadingUI(steps[0]);
+            
+            loadingAnimation = setInterval(() => {
+                state.loadingStep++;
+                if (state.loadingStep < steps.length) {
+                    updateLoadingStep(state.loadingStep);
+                }
+            }, 2500);
+            
+            const progressBar = document.getElementById('loadingProgressBar');
+            if (progressBar) {
+                progressBar.style.width = '30%';
+                setTimeout(() => { progressBar.style.width = '60%'; }, 1000);
+                setTimeout(() => { progressBar.style.width = '80%'; }, 2000);
+            }
+        }
+
+        function updateLoadingStep(step) {
+            const steps = getLoadingSteps();
+            if (step < steps.length) {
+                updateLoadingUI(steps[step]);
+                
+                const progressBar = document.getElementById('loadingProgressBar');
+                if (progressBar) {
+                    const widths = ['15%', '35%', '65%', '90%'];
+                    progressBar.style.width = widths[step] || '90%';
+                }
+            }
+        }
+
+        function updateLoadingUI(step) {
+            const statusEl = document.getElementById('loadingStatus');
+            const subtextEl = document.getElementById('loadingSubtext');
+            if (statusEl) statusEl.textContent = step.status;
+            if (subtextEl) subtextEl.textContent = step.subtext;
+        }
+
+        function stopLoadingAnimation() {
+            if (loadingAnimation) {
+                clearInterval(loadingAnimation);
+                loadingAnimation = null;
+            }
+            const progressBar = document.getElementById('loadingProgressBar');
+            if (progressBar) progressBar.style.width = '100%';
+        }
+
+        function validateForm() {
+            let isValid = true;
+            const name = document.getElementById('fullName').value.trim();
+            const id = document.getElementById('userId').value.trim();
+            const skill = document.getElementById('skillInput').value.trim();
+            const experience = document.getElementById('experience').value;
+
+            if (!name) {
+                document.getElementById('nameError').classList.add('visible');
+                isValid = false;
+            } else {
+                document.getElementById('nameError').classList.remove('visible');
+            }
+
+            if (!id) {
+                document.getElementById('idError').classList.add('visible');
+                isValid = false;
+            } else {
+                document.getElementById('idError').classList.remove('visible');
+            }
+
+            if (!skill) {
+                document.getElementById('skillError').classList.add('visible');
+                isValid = false;
+            } else {
+                document.getElementById('skillError').classList.remove('visible');
+            }
+
+            if (!experience || experience < 0 || experience > 50) {
+                document.getElementById('expError').classList.add('visible');
+                isValid = false;
+            } else {
+                document.getElementById('expError').classList.remove('visible');
+            }
+
+            return isValid;
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('regError');
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('visible');
+            }
+        }
+
+        function hideError() {
+            const errorEl = document.getElementById('regError');
+            if (errorEl) {
+                errorEl.classList.remove('visible');
+            }
+        }
+
+        async function handleRegistration(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) return;
+            
+            hideError();
+            
+            const userData = {
+                name: document.getElementById('fullName').value.trim(),
+                id: document.getElementById('userId').value.trim(),
+                skill: document.getElementById('skillInput').value.trim(),
+                experience: document.getElementById('experience').value
+            };
+            
+            state.user = userData;
+            
+            showSection('loading');
+            startLoadingAnimation();
+            
+            try {
+                console.log('Checking attempts for:', userData.id, userData.skill);
+                
+                const checkResp = await fetch(`${API_BASE}/api/check-attempts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: userData.id, skill: userData.skill })
+                });
+                
+                console.log('Check attempts response:', checkResp.status);
+                
+                if (!checkResp.ok) {
+                    throw new Error(`Check attempts failed: ${checkResp.status}`);
+                }
+                
+                const checkData = await checkResp.json();
+                console.log('Check data:', checkData);
+                
+                if (!checkData.allowed) {
+                    stopLoadingAnimation();
+                    showSection('registration');
+                    showError(`Maximum attempts (2) reached for this User ID. You cannot retry.`);
+                    return;
+                }
+                
+                state.attemptsRemaining = checkData.attempts_remaining || 2;
+                state.attemptNumber = (checkData.attempts_used || 0) + 1;
+                
+                const regResp = await fetch(`${API_BASE}/api/register-attempt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: userData.id, skill: userData.skill })
+                });
+                
+                console.log('Register attempt response:', regResp.status);
+                
+                if (!regResp.ok) {
+                    throw new Error(`Register attempt failed: ${regResp.status}`);
+                }
+                
+                updateLoadingStep(1);
+                await generateQuestions(userData);
+            } catch (err) {
+                console.error('Registration error:', err);
+                state.attemptsRemaining = 2;
+                state.attemptNumber = 1;
+                await generateQuestions(userData);
+            }
+        }
+
+        async function generateQuestions(userData) {
+            try {
+                const payload = {
+                    student_id: userData.id,
+                    student_name: userData.name,
+                    skills: [userData.skill],
+                    exp_level: `${userData.experience} years`,
+                    subject: userData.skill
+                };
+                
+                console.log('Generating questions with payload:', payload);
+                
+                const response = await fetch(`${API_BASE}/generate-assignment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: AbortSignal.timeout(45000)
+                });
+                
+                console.log('Generate response status:', response.status);
+                
+                if (!response.ok) throw new Error('Failed to generate');
+                
+                let buffer = '';
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value);
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const data = JSON.parse(line);
+                            console.log('Received data type:', data.type);
+                            if (data.type === 'complete' && data.assignment) {
+                                state.questions = (data.assignment.mcqs || []).slice(0, 20);
+                                console.log('Got', state.questions.length, 'questions');
+                                stopLoadingAnimation();
+                                if (state.questions.length < 20) {
+                                    loadFallbackQuestions();
+                                } else {
+                                    updateLoadingStep(2);
+                                    setTimeout(() => {
+                                        startQuiz();
+                                    }, 500);
+                                }
+                                return;
+                            } else if (data.type === 'error') {
+                                console.error('Generation error:', data.error);
+                            }
+                        } catch (e) {}
+                    }
+                }
+                
+                loadFallbackQuestions();
+                
+            } catch (err) {
+                console.error('Error:', err);
+                loadFallbackQuestions();
+            }
+        }
+
+        function getSectionConfig(questionNum) {
+            return SECTION_CONFIG.find(s => questionNum >= s.start && questionNum <= s.end) || SECTION_CONFIG[0];
+        }
+
+        function startQuiz() {
+            state.currentIndex = 0;
+            state.answers = {};
+            state.startTime = Date.now();
+            
+            document.getElementById('attemptBadge').textContent = `Attempt ${state.attemptNumber} of 2`;
+            
+            showSection('quiz');
+            renderQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            if (state.timer) clearInterval(state.timer);
+            
+            const config = getSectionConfig(state.currentIndex + 1);
+            state.timeRemaining = config.time;
+            state.totalTime = config.time;
+            
+            const circumference = 2 * Math.PI * 30;
+            const progressEl = document.getElementById('timerProgress');
+            const textEl = document.getElementById('timerText');
+            const sectionEl = document.getElementById('sectionIndicator');
+            
+            document.getElementById('currentQ').textContent = state.currentIndex + 1;
+            document.getElementById('totalQ').textContent = state.questions.length;
+            sectionEl.textContent = config.label;
+            sectionEl.className = 'section-indicator ' + (config.start === 1 ? 'section-1' : config.start === 11 ? 'section-2' : 'section-3');
+            
+            progressEl.style.strokeDashoffset = 0;
+            progressEl.classList.remove('warning', 'danger');
+            textEl.classList.remove('warning', 'danger');
+            textEl.textContent = state.timeRemaining;
+            
+            state.timer = setInterval(() => {
+                state.timeRemaining--;
+                
+                const offset = circumference * (1 - state.timeRemaining / state.totalTime);
+                progressEl.style.strokeDashoffset = offset;
+                
+                if (state.timeRemaining <= 5) {
+                    progressEl.classList.add('danger');
+                    progressEl.classList.remove('warning');
+                    textEl.classList.add('danger');
+                    textEl.classList.remove('warning');
+                } else if (state.timeRemaining <= Math.floor(state.totalTime * 0.4)) {
+                    progressEl.classList.add('warning');
+                    textEl.classList.add('warning');
+                }
+                
+                textEl.textContent = state.timeRemaining;
+                
+                if (state.timeRemaining <= 0) {
+                    clearInterval(state.timer);
+                    submitCurrentQuestion(true);
+                }
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            const q = state.questions[state.currentIndex];
+            if (!q) return;
+            
+            document.getElementById('qText').textContent = q.question;
+            
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            const selectedAnswer = state.answers[q.id];
+            
+            q.options.forEach((opt, i) => {
+                const letter = letters[i] || String.fromCharCode(65 + i);
+                const div = document.createElement('div');
+                div.className = 'option-item' + (selectedAnswer === letter ? ' selected' : '');
+                div.innerHTML = `<span class="option-marker">${letter}</span><span>${opt.replace(/^[A-D]\.\s*/, '')}</span>`;
+                div.addEventListener('click', () => selectOption(letter));
+                optionsList.appendChild(div);
+            });
+        }
+
+        function selectOption(letter) {
+            const q = state.questions[state.currentIndex];
+            if (q) {
+                state.answers[q.id] = letter;
+                renderQuestion();
+            }
+        }
+
+        function submitCurrentQuestion(timedOut = false) {
+            clearInterval(state.timer);
+            
+            const q = state.questions[state.currentIndex];
+            if (q && !state.answers[q.id]) {
+                state.answers[q.id] = null;
+            }
+            
+            if (state.currentIndex < state.questions.length - 1) {
+                state.currentIndex++;
+                renderQuestion();
+                startTimer();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            showSection('results');
+            
+            let correct = 0, incorrect = 0, unanswered = 0;
+            
+            state.questions.forEach(q => {
+                const userAns = state.answers[q.id];
+                if (userAns === null || userAns === undefined) {
+                    unanswered++;
+                } else if (userAns === q.correct) {
+                    correct++;
+                } else {
+                    incorrect++;
+                }
+            });
+            
+            const total = state.questions.length;
+            const percentage = Math.round((correct / total) * 100);
+            const timeTaken = (Date.now() - state.startTime) / 1000;
+            
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            
+            const passStatus = document.getElementById('passStatus');
+            passStatus.textContent = percentage >= PASS_THRESHOLD ? 'PASSED' : 'NOT PASSED';
+            passStatus.className = `pass-status ${percentage >= PASS_THRESHOLD ? 'passed' : 'failed'}`;
+            
+            document.getElementById('correctCount').textContent = correct;
+            document.getElementById('incorrectCount').textContent = incorrect;
+            document.getElementById('unansweredCount').textContent = unanswered;
+
+            // Build question review
+            const detailContainer = document.getElementById('resultsDetail');
+            if (detailContainer) {
+                let reviewHTML = `<h3>Question Review</h3>`;
+                
+                state.questions.forEach((q, index) => {
+                    const userAns = state.answers[q.id];
+                    let status = 'unanswered';
+                    if (userAns === null || userAns === undefined) {
+                        status = 'unanswered';
+                    } else if (userAns === q.correct) {
+                        status = 'correct';
+                    } else {
+                        status = 'incorrect';
+                    }
+                    
+                    const questionNumber = index + 1;
+                    const userAnswerText = userAns ? userAns : 'Not answered';
+                    const correctAnswerText = q.correct;
+                    
+                    reviewHTML += `
+                        <div class="question-review ${status}">
+                            <div class="review-question">Q${questionNumber}. ${q.question}</div>
+                            <div class="review-answer your-answer">Your answer: ${userAnswerText}</div>
+                            ${status !== 'correct' ? `<div class="review-answer correct-answer">Correct answer: ${correctAnswerText}</div>` : ''}
+                            ${q.explanation ? `<div class="review-explanation">${q.explanation}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                detailContainer.innerHTML = reviewHTML;
+            }
+            
+            fetch(`${API_BASE}/api/submit-result`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_id: state.user.id,
+                    student_name: state.user.name,
+                    skill: state.user.skill,
+                    answers: state.answers,
+                    score: correct,
+                    total: total,
+                    time_taken: timeTaken
+                })
+            }).catch(err => console.log('Result submission skipped:', err));
+        }
+
+        function newAssessment() {
+            state.user = {};
+            state.questions = [];
+            state.answers = {};
+            state.currentIndex = 0;
+            showSection('hero');
+        }
+
+        const elements = {
+            heroSection: document.getElementById('heroSection'),
+            registrationSection: document.getElementById('registrationSection'),
+            loadingSection: document.getElementById('loadingSection'),
+            quizSection: document.getElementById('quizSection'),
+            resultsSection: document.getElementById('resultsSection')
+        };
+
+        function showSection(name) {
+            elements.heroSection.classList.add('hidden');
+            elements.registrationSection.classList.add('hidden');
+            elements.loadingSection.classList.add('hidden');
+            elements.quizSection.classList.add('hidden');
+            elements.resultsSection.classList.add('hidden');
+            
+            switch (name) {
+                case 'hero': elements.heroSection.classList.remove('hidden'); break;
+                case 'registration': elements.registrationSection.classList.remove('hidden'); break;
+                case 'loading': elements.loadingSection.classList.remove('hidden'); break;
+                case 'quiz': elements.quizSection.classList.remove('hidden'); break;
+                case 'results': elements.resultsSection.classList.remove('hidden'); break;
+            }
+        }
+
+        // Initialize event listeners
+        document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
+        document.getElementById('newTestBtn').addEventListener('click', newAssessment);
+        document.getElementById('startHeroBtn').addEventListener('click', () => {
+            showSection('registration');
+        });
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            const q = state.questions[state.currentIndex];
+            if (q && state.answers[q.id]) {
+                submitCurrentQuestion();
+            } else {
+                alert('Please select an answer before submitting');
+            }
+        });
+        document.getElementById('skipBtn').addEventListener('click', () => submitCurrentQuestion(true));
+        
+        // Initialize skill search with smart suggestions
+        initSkillSearch();
+    </script>
+</body>
+</html>
