@@ -400,6 +400,11 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 240, 255, 0.3);
         }
+        
+        .btn-primary:not(:disabled):active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+        }
 
         .btn-primary:disabled {
             opacity: 0.5;
@@ -791,6 +796,12 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
 
         @keyframes colorShift {
             0% { border-top-color: var(--color-cyan); border-right-color: var(--glass-border); }
@@ -868,7 +879,7 @@
     <canvas id="bgCanvas"></canvas>
     <div class="container">
         <header>
-            <h1 class="logo">SKILL ACHIVER</h1>
+            <h1 class="logo">Skill Assessment</h1>
         </header>
 
         <!-- Hero Section -->
@@ -910,30 +921,64 @@
         <section id="registrationSection" class="hidden">
             <div class="error-banner" id="regError"></div>
             
-            <div class="card">
+            <div style="display:flex;justify-content:center;margin-bottom:30px;">
+                <div style="text-align:center;">
+                    <div style="font-family:var(--font-display);font-size:3rem;font-weight:800;color:var(--color-cyan);margin-bottom:10px;">Assessment Form</div>
+                    <div style="color:rgba(255,255,255,0.6);font-size:1rem;">Complete the details below to start your skill assessment</div>
+                </div>
+            </div>
+            
+            <div class="card" style="max-width:480px;margin:0 auto;background:linear-gradient(135deg,rgba(19,24,66,0.9),rgba(10,14,39,0.95));border:1px solid rgba(0,240,255,0.2);">
                 <form id="registrationForm">
-                    <div class="form-group">
-                        <input type="text" class="form-input" id="fullName" placeholder="Full Name">
-                        <div class="form-error" id="nameError">Please enter your full name</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Full Name <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="fullName" placeholder="John Doe" style="width:100%;">
+                            <div class="form-error" id="nameError">Please enter your full name</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">User ID <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="userId" placeholder="1234" maxlength="4" style="width:100%;text-align:center;letter-spacing:2px;">
+                            <div class="form-error" id="idError">Please enter a valid User ID</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Experience <span class="required">*</span></label>
+                            <input type="number" class="form-input" id="experience" placeholder="3" min="0" max="50" style="width:100%;">
+                            <div class="form-error" id="expError">Enter 0-50 years</div>
+                        </div>
+                        
+                        <div class="form-group" style="grid-column:1 / -1;">
+                            <label class="form-label">Skill to Assess <span class="required">*</span></label>
+                            <input type="text" class="form-input" id="skillInput" placeholder="Python, JavaScript, AWS, ML, Docker, Kubernetes..." style="transition:all 0.3s;">
+                            <div class="skill-suggestions" id="skillSuggestions"></div>
+                            <div class="form-error" id="skillError">Please enter a skill</div>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <input type="text" class="form-input" id="userId" placeholder="User ID">
-                        <div class="form-error" id="idError">Please enter a valid User ID</div>
+                    <div style="margin-top:25px;display:flex;gap:15px;">
+                        <div style="flex:1;text-align:center;padding:12px;background:rgba(0,240,255,0.1);border-radius:10px;border:1px solid rgba(0,240,255,0.2);">
+                            <div style="color:var(--color-cyan);font-family:var(--font-display);font-size:1.5rem;">2</div>
+                            <div style="font-size:0.8rem;opacity:0.7;">Attempts</div>
+                        </div>
+                        <div style="flex:1;text-align:center;padding:12px;background:rgba(168,85,247,0.1);border-radius:10px;border:1px solid rgba(168,85,247,0.2);">
+                            <div style="color:var(--color-violet);font-family:var(--font-display);font-size:1.5rem;">20</div>
+                            <div style="font-size:0.8rem;opacity:0.7;">Questions</div>
+                        </div>
+                        <div style="flex:1;text-align:center;padding:12px;background:rgba(16,185,129,0.1);border-radius:10px;border:1px solid rgba(16,185,129,0.2);">
+                            <div style="color:var(--color-green);font-family:var(--font-display);font-size:1.5rem;">80%</div>
+                            <div style="font-size:0.8rem;opacity:0.7;">To Pass</div>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <input type="text" class="form-input" id="skillInput" placeholder="Type a skill (e.g., aws, js, ml)">
-                        <div class="skill-suggestions" id="skillSuggestions"></div>
-                        <div class="form-error" id="skillError">Please enter a skill</div>
-                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;margin-top:25px;font-size:1.1rem;padding:18px 28px;font-family:var(--font-display);letter-spacing:1px;">
+                        BEGIN ASSESSMENT
+                    </button>
                     
-                    <div class="form-group">
-                        <input type="number" class="form-input" id="experience" placeholder="Years of Experience" min="0" max="50">
-                        <div class="form-error" id="expError">Enter 0-50 years</div>
+                    <div style="text-align:center;margin-top:20px;font-size:0.85rem;opacity:0.6;">
+                        🔒 Your data is secure and private
                     </div>
-                    
-                    <button type="submit" class="btn btn-primary">Start Assessment</button>
                 </form>
             </div>
         </section>
@@ -1416,8 +1461,76 @@
             startTime: null,
             attemptNumber: 1,
             attemptsRemaining: 2,
-            loadingStep: 0
+            loadingStep: 0,
+            sessionStart: null,
+            hasExistingSession: false
         };
+
+        const SESSION_KEY = 'skillAssessment_session';
+        const MAX_ATTEMPTS = 2;
+        const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+
+        function saveSession() {
+            const sessionData = {
+                user: state.user,
+                questions: state.questions,
+                currentIndex: state.currentIndex,
+                answers: state.answers,
+                startTime: state.startTime,
+                attemptNumber: state.attemptNumber,
+                attemptKey: `${state.user.id}:${state.user.skill}`,
+                hasStartedAttempt: state.hasStartedAttempt || false,
+                savedAt: Date.now()
+            };
+            try {
+                localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+            } catch (e) {
+                console.error('Session save failed:', e);
+            }
+        }
+
+        function loadSession() {
+            try {
+                const saved = localStorage.getItem(SESSION_KEY);
+                if (!saved) return null;
+                
+                const sessionData = JSON.parse(saved);
+                if (!sessionData.user || !sessionData.user.id) return null;
+                
+                if (Date.now() - sessionData.savedAt > SESSION_EXPIRY_MS) {
+                    clearSession();
+                    return null;
+                }
+                
+                return sessionData;
+            } catch (e) {
+                console.error('Session load failed:', e);
+                return null;
+            }
+        }
+
+        function clearSession() {
+            localStorage.removeItem(SESSION_KEY);
+            state.hasExistingSession = false;
+        }
+
+        async function checkExistingAttempts(studentId, skill) {
+            try {
+                const response = await fetch(`${API_BASE}/api/check-attempts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentId, skill: skill })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return data;
+                }
+            } catch (e) {
+                console.error('Check attempts failed:', e);
+            }
+            return { allowed: true, attempts_remaining: MAX_ATTEMPTS, attempts_used: 0 };
+        }
 
         const SKILL_DATABASE = [
             { short: 'aws', full: 'Amazon Web Services' },
@@ -1884,6 +1997,7 @@
         }
 
         function stopLoadingAnimation() {
+            console.log('=== stopLoadingAnimation called ===');
             if (loadingAnimation) {
                 clearInterval(loadingAnimation);
                 loadingAnimation = null;
@@ -1906,7 +2020,8 @@
                 document.getElementById('nameError').classList.remove('visible');
             }
 
-            if (!id) {
+            if (!id || !/^\d{4}$/.test(id)) {
+                document.getElementById('idError').textContent = 'Enter 4-digit number (e.g., 1234)';
                 document.getElementById('idError').classList.add('visible');
                 isValid = false;
             } else {
@@ -1959,6 +2074,15 @@
                 experience: document.getElementById('experience').value
             };
             
+            const localAttemptsKey = `attempts_${userData.id}_${userData.skill}`;
+            const localAttempts = parseInt(localStorage.getItem(localAttemptsKey) || '0');
+            
+            if (localAttempts >= MAX_ATTEMPTS) {
+                showError(`Maximum attempts (${MAX_ATTEMPTS}) reached. Please clear browser data or use different credentials.`);
+                showSection('registration');
+                return;
+            }
+            
             state.user = userData;
             
             showSection('loading');
@@ -1985,17 +2109,22 @@
                 if (!checkData.allowed) {
                     stopLoadingAnimation();
                     showSection('registration');
-                    showError(`Maximum attempts (2) reached for this User ID. You cannot retry.`);
+                    showError(`Maximum attempts (${MAX_ATTEMPTS}) reached for this User ID. You cannot retry.`);
                     return;
                 }
                 
-                state.attemptsRemaining = checkData.attempts_remaining || 2;
+                state.attemptsRemaining = checkData.attempts_remaining || MAX_ATTEMPTS;
                 state.attemptNumber = (checkData.attempts_used || 0) + 1;
                 
                 const regResp = await fetch(`${API_BASE}/api/register-attempt`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: userData.id, skill: userData.skill })
+                    body: JSON.stringify({
+                        student_id: userData.id,
+                        student_name: userData.name,
+                        skill: userData.skill,
+                        experience: userData.experience
+                    })
                 });
                 
                 console.log('Register attempt response:', regResp.status);
@@ -2004,17 +2133,22 @@
                     throw new Error(`Register attempt failed: ${regResp.status}`);
                 }
                 
+                localStorage.setItem(localAttemptsKey, state.attemptNumber);
+                
                 updateLoadingStep(1);
                 await generateQuestions(userData);
-            } catch (err) {
+} catch (err) {
                 console.error('Registration error:', err);
-                state.attemptsRemaining = 2;
-                state.attemptNumber = 1;
+                showError('Server error. Starting with offline questions.');
+                state.attemptsRemaining = MAX_ATTEMPTS;
+                state.attemptNumber = localAttempts + 1;
+                localStorage.setItem(localAttemptsKey, state.attemptNumber);
                 await generateQuestions(userData);
             }
         }
 
         async function generateQuestions(userData) {
+            console.log('=== Starting generateQuestions ===');
             try {
                 const payload = {
                     student_id: userData.id,
@@ -2025,17 +2159,22 @@
                 };
                 
                 console.log('Generating questions with payload:', payload);
+                console.log('API_BASE:', API_BASE);
                 
                 const response = await fetch(`${API_BASE}/generate-assignment`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
-                    signal: AbortSignal.timeout(45000)
+                    signal: AbortSignal.timeout(120000)
                 });
                 
                 console.log('Generate response status:', response.status);
                 
-                if (!response.ok) throw new Error('Failed to generate');
+                if (!response.ok) {
+                    console.error('Failed to generate, status:', response.status);
+                    loadFallbackQuestions();
+                    return;
+                }
                 
                 let buffer = '';
                 const reader = response.body.getReader();
@@ -2054,9 +2193,11 @@
                         try {
                             const data = JSON.parse(line);
                             console.log('Received data type:', data.type);
+                            
                             if (data.type === 'complete' && data.assignment) {
                                 state.questions = (data.assignment.mcqs || []).slice(0, 20);
                                 console.log('Got', state.questions.length, 'questions');
+                                console.log('Cost:', data.cost_inr);
                                 stopLoadingAnimation();
                                 if (state.questions.length < 20) {
                                     loadFallbackQuestions();
@@ -2087,15 +2228,22 @@
         }
 
         function startQuiz() {
+            console.log('=== startQuiz called ===');
             state.currentIndex = 0;
             state.answers = {};
             state.startTime = Date.now();
+            state.sessionStart = Date.now();
             
-            document.getElementById('attemptBadge').textContent = `Attempt ${state.attemptNumber} of 2`;
+            // Mark that user has started attempting - refresh will count as attempt used
+            state.hasStartedAttempt = true;
+            
+            document.getElementById('attemptBadge').textContent = `Attempt ${state.attemptNumber} of ${MAX_ATTEMPTS}`;
             
             showSection('quiz');
+            console.log('Quiz section shown, questions:', state.questions.length);
             renderQuestion();
             startTimer();
+            saveSession();
         }
 
         function startTimer() {
@@ -2138,6 +2286,10 @@
                 
                 textEl.textContent = state.timeRemaining;
                 
+                if (state.timeRemaining % 10 === 0) {
+                    saveSession();
+                }
+                
                 if (state.timeRemaining <= 0) {
                     clearInterval(state.timer);
                     submitCurrentQuestion(true);
@@ -2154,42 +2306,162 @@
             const optionsList = document.getElementById('optionsList');
             optionsList.innerHTML = '';
             
-            const letters = ['A', 'B', 'C', 'D'];
-            const selectedAnswer = state.answers[q.id];
+            const selectedAnswer = state.answers[state.currentIndex];
             
             q.options.forEach((opt, i) => {
-                const letter = letters[i] || String.fromCharCode(65 + i);
+                const letter = String.fromCharCode(65 + i);
                 const div = document.createElement('div');
-                div.className = 'option-item' + (selectedAnswer === letter ? ' selected' : '');
-                div.innerHTML = `<span class="option-marker">${letter}</span><span>${opt.replace(/^[A-D]\.\s*/, '')}</span>`;
+                const isSelected = selectedAnswer === letter;
+                div.className = 'option-item' + (isSelected ? ' selected' : '');
+                div.innerHTML = `<span class="option-marker">${letter}</span><span>${opt.replace(/^[A-E]\.\s*/, '')}</span>`;
                 div.addEventListener('click', () => selectOption(letter));
                 optionsList.appendChild(div);
             });
         }
 
         function selectOption(letter) {
-            const q = state.questions[state.currentIndex];
-            if (q) {
-                state.answers[q.id] = letter;
-                renderQuestion();
-            }
+            state.answers[state.currentIndex] = letter;
+            console.log('Selected:', letter, 'at index:', state.currentIndex, 'all answers:', state.answers);
+            renderQuestion();
+            saveSession();
         }
 
         function submitCurrentQuestion(timedOut = false) {
             clearInterval(state.timer);
             
-            const q = state.questions[state.currentIndex];
-            if (q && !state.answers[q.id]) {
-                state.answers[q.id] = null;
+            const nextBtn = document.getElementById('nextBtn');
+            const skipBtn = document.getElementById('skipBtn');
+            
+            // Show submitting state
+            nextBtn.textContent = '✓ Submitted';
+            nextBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            nextBtn.disabled = true;
+            skipBtn.disabled = true;
+            
+            const idx = state.currentIndex;
+            if (!state.answers[idx]) {
+                state.answers[idx] = null;
+            }
+            saveSession();
+            
+            // Move to next question after brief delay
+            setTimeout(() => {
+                nextBtn.disabled = false;
+                skipBtn.disabled = false;
+                nextBtn.textContent = 'Submit & Next';
+                nextBtn.style.background = '';
+                
+                if (state.currentIndex < state.questions.length - 1) {
+                    state.currentIndex++;
+                    renderQuestion();
+                    startTimer();
+                } else {
+                    clearSession();
+                    showResults();
+                }
+            }, 500);
+        }
+
+        function normalizeAnswer(answer) {
+            if (!answer) return null;
+            if (answer === null || answer === undefined) return null;
+            if (answer === '') return null;
+            
+            let normalized = answer.toString().trim();
+            
+            if (Array.isArray(answer)) {
+                return answer.map(a => normalizeAnswer(a)).filter(Boolean).sort().join(',');
             }
             
-            if (state.currentIndex < state.questions.length - 1) {
-                state.currentIndex++;
-                renderQuestion();
-                startTimer();
-            } else {
-                showResults();
+            if (normalized.length === 1 && /[A-Z]/.test(normalized)) {
+                return normalized.toUpperCase();
             }
+            
+            const letterMatch = normalized.match(/^[A-Z]/i);
+            if (letterMatch) {
+                return letterMatch[0].toUpperCase();
+            }
+            
+            const dotMatch = normalized.match(/^([A-Z])\.[\s:]/i);
+            if (dotMatch) {
+                return dotMatch[1].toUpperCase();
+            }
+            
+            return normalized.toUpperCase();
+        }
+
+        function isAnswerCorrect(userAnswer, correctAnswer) {
+            if (userAnswer === null || userAnswer === undefined || userAnswer === '') {
+                return false;
+            }
+            if (correctAnswer === null || correctAnswer === undefined || correctAnswer === '') {
+                return false;
+            }
+            
+            const userNorm = normalizeAnswer(userAnswer);
+            const correctNorm = normalizeAnswer(correctAnswer);
+            
+            if (!userNorm || !correctNorm) {
+                console.log('normalize failed:', { userAnswer, correctAnswer, userNorm, correctNorm });
+                return false;
+            }
+            
+            if (userNorm === correctNorm) {
+                return true;
+            }
+            
+            if (correctNorm.includes(',')) {
+                const correctParts = correctNorm.split(',').map(p => p.trim().toUpperCase()).sort();
+                const userParts = userNorm.split(',').map(p => p.trim().toUpperCase()).sort();
+                if (JSON.stringify(correctParts) === JSON.stringify(userParts)) {
+                    return true;
+                }
+            }
+            
+            if (correctNorm.includes(userNorm) || userNorm.includes(correctNorm)) {
+                return true;
+            }
+            
+            return false;
+        }
+
+        function getUserAnswerText(userAns, q) {
+            if (!userAns) return 'Not answered';
+            if (q && q.options) {
+                const userLetter = normalizeAnswer(userAns);
+                if (userLetter && userLetter.length === 1) {
+                    const option = q.options.find(opt => 
+                        normalizeAnswer(opt) === userLetter || 
+                        opt.startsWith(userLetter + '.') || 
+                        opt.startsWith(userLetter + ')')
+                    );
+                    if (option) return option;
+                }
+            }
+            return userAns.toString();
+        }
+
+        function getCorrectAnswerText(q) {
+            if (!q || !q.correct) return 'N/A';
+            let text = q.correct;
+            if (typeof text === 'string' && q.options) {
+                for (const opt of q.options) {
+                    const optLetter = opt.charAt(0).toUpperCase();
+                    const corrLetter = text.charAt(0).toUpperCase();
+                    if (optLetter === corrLetter) {
+                        return opt;
+                    }
+                    if (opt.includes(text) || text.includes(opt.substring(3))) {
+                        return opt;
+                    }
+                }
+                if (text.startsWith('A') || text.startsWith('B') || text.startsWith('C') || text.startsWith('D')) {
+                    const letter = text.charAt(0).toUpperCase();
+                    const option = q.options.find(opt => opt.startsWith(letter + '.'));
+                    if (option) return option;
+                }
+            }
+            return text.toString();
         }
 
         function showResults() {
@@ -2197,64 +2469,66 @@
             
             let correct = 0, incorrect = 0, unanswered = 0;
             
-            state.questions.forEach(q => {
-                const userAns = state.answers[q.id];
-                if (userAns === null || userAns === undefined) {
+            console.log('Showing results - questions:', state.questions.length, 'answers:', state.answers);
+            
+            state.questions.forEach((q, idx) => {
+                const userAns = state.answers[idx] || state.answers[q?.id] || state.answers[idx + 1];
+                
+                if (userAns === null || userAns === undefined || userAns === '' || userAns === null) {
                     unanswered++;
-                } else if (userAns === q.correct) {
+                } else if (isAnswerCorrect(userAns, q.correct)) {
                     correct++;
                 } else {
                     incorrect++;
                 }
             });
             
-            const total = state.questions.length;
-            const percentage = Math.round((correct / total) * 100);
-            const timeTaken = (Date.now() - state.startTime) / 1000;
+            // Calculate percentage based on ANSWERED questions only (not unanswered)
+            const answered = correct + incorrect;
+            const percentage = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            const timeTaken = ((Date.now() - state.startTime) / 1000 / 60).toFixed(2);
             
             document.getElementById('finalScore').textContent = `${percentage}%`;
             
             const passStatus = document.getElementById('passStatus');
-            passStatus.textContent = percentage >= PASS_THRESHOLD ? 'PASSED' : 'NOT PASSED';
+            passStatus.textContent = percentage >= PASS_THRESHOLD ? 'PASSED ✓' : 'FAILED ✗';
             passStatus.className = `pass-status ${percentage >= PASS_THRESHOLD ? 'passed' : 'failed'}`;
             
             document.getElementById('correctCount').textContent = correct;
             document.getElementById('incorrectCount').textContent = incorrect;
             document.getElementById('unansweredCount').textContent = unanswered;
+            
+            // Add time display
+            const statsContainer = document.querySelector('.results-stats');
+            if (statsContainer && !document.getElementById('timeCount')) {
+                statsContainer.innerHTML += `
+                    <div class="stat-card">
+                        <div class="stat-value" id="timeCount">${timeTaken} min</div>
+                        <div class="stat-label">Time Taken</div>
+                    </div>
+                `;
+            } else if (document.getElementById('timeCount')) {
+                document.getElementById('timeCount').textContent = timeTaken + ' min';
+            }
 
-            // Build question review
             const detailContainer = document.getElementById('resultsDetail');
             if (detailContainer) {
-                let reviewHTML = `<h3>Question Review</h3>`;
-                
-                state.questions.forEach((q, index) => {
-                    const userAns = state.answers[q.id];
-                    let status = 'unanswered';
-                    if (userAns === null || userAns === undefined) {
-                        status = 'unanswered';
-                    } else if (userAns === q.correct) {
-                        status = 'correct';
-                    } else {
-                        status = 'incorrect';
-                    }
-                    
-                    const questionNumber = index + 1;
-                    const userAnswerText = userAns ? userAns : 'Not answered';
-                    const correctAnswerText = q.correct;
-                    
-                    reviewHTML += `
-                        <div class="question-review ${status}">
-                            <div class="review-question">Q${questionNumber}. ${q.question}</div>
-                            <div class="review-answer your-answer">Your answer: ${userAnswerText}</div>
-                            ${status !== 'correct' ? `<div class="review-answer correct-answer">Correct answer: ${correctAnswerText}</div>` : ''}
-                            ${q.explanation ? `<div class="review-explanation">${q.explanation}</div>` : ''}
-                        </div>
-                    `;
-                });
+                let reviewHTML = `<h3>Question Review</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:15px;">
+                        ${state.questions.map((q, index) => {
+                            const userAns = state.answers[index] || state.answers[q.id];
+                            let icon = '⭕';
+                            if (userAns === null || userAns === undefined || userAns === '') icon = '⏭';
+                            else if (isAnswerCorrect(userAns, q.correct)) icon = '✓';
+                            else icon = '✗';
+                            return `<span style="font-size:1.1rem;">${icon}</span>`;
+                        }).join('')}
+                    </div>`;
                 
                 detailContainer.innerHTML = reviewHTML;
             }
             
+            // Send results to server
             fetch(`${API_BASE}/api/submit-result`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2264,17 +2538,21 @@
                     skill: state.user.skill,
                     answers: state.answers,
                     score: correct,
-                    total: total,
+                    total: answered,  // Based on answered only
+                    unanswered: unanswered,
                     time_taken: timeTaken
                 })
             }).catch(err => console.log('Result submission skipped:', err));
         }
 
         function newAssessment() {
+            clearSession();
             state.user = {};
             state.questions = [];
             state.answers = {};
             state.currentIndex = 0;
+            state.attemptNumber = 1;
+            state.attemptsRemaining = MAX_ATTEMPTS;
             showSection('hero');
         }
 
@@ -2302,21 +2580,94 @@
             }
         }
 
-        // Initialize event listeners
         document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
         document.getElementById('newTestBtn').addEventListener('click', newAssessment);
-        document.getElementById('startHeroBtn').addEventListener('click', () => {
+        
+        document.getElementById('startHeroBtn').addEventListener('click', async () => {
+            console.log('Start Assessment clicked');
+            
+            // Always start fresh - clear any old session
+            clearSession();
+            
             showSection('registration');
         });
+
+        function handlePageLoad() {
+            const session = loadSession();
+            if (session && session.user && session.user.id && session.answers && Object.keys(session.answers).length > 0) {
+                console.log('User refreshed during test - showing results');
+                
+                // Count attempt + show results (user refreshed = test over)
+                if (session.hasStartedAttempt) {
+                    fetch(`${API_BASE}/api/register-attempt`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            student_id: session.user.id,
+                            student_name: session.user.name,
+                            skill: session.user.skill,
+                            experience: session.user.experience
+                        })
+                    }).catch(() => {});
+                }
+                
+                // Show results for answered questions
+                state.user = session.user;
+                state.questions = session.questions || [];
+                state.answers = session.answers || {};
+                state.currentIndex = session.currentIndex || 0;
+                state.startTime = session.startTime || Date.now();
+                state.attemptNumber = session.attemptNumber || 1;
+                
+                // If no questions in session, load fallback
+                if (state.questions.length === 0) {
+                    const skill = (session.user.skill || '').toLowerCase();
+                    const matchedKey = Object.keys(FALLBACK_QUESTIONS).find(k => skill.includes(k.toLowerCase()));
+                    state.questions = matchedKey && FALLBACK_QUESTIONS[matchedKey] ? FALLBACK_QUESTIONS[matchedKey] : FALLBACK_QUESTIONS.default;
+                }
+                
+                showResults();
+                
+                alert('Assessment ended due to page refresh. Your progress has been saved.');
+            }
+        }
+
+window.addEventListener('load', handlePageLoad);
+        
+        // Submit & Next button - require option selection
         document.getElementById('nextBtn').addEventListener('click', () => {
             const q = state.questions[state.currentIndex];
-            if (q && state.answers[q.id]) {
-                submitCurrentQuestion();
-            } else {
-                alert('Please select an answer before submitting');
+            const selectedAnswer = state.answers[state.currentIndex] || state.answers[q?.id];
+            const nextBtn = document.getElementById('nextBtn');
+            const skipBtn = document.getElementById('skipBtn');
+            
+            if (!q) return;
+            
+            if (!selectedAnswer) {
+                // No option selected - shake and show warning
+                nextBtn.style.animation = 'none';
+                nextBtn.offsetHeight;
+                nextBtn.style.animation = 'shake 0.3s';
+                nextBtn.textContent = 'Select Option First';
+                
+                setTimeout(() => {
+                    nextBtn.textContent = 'Submit & Next';
+                }, 1500);
+                return;
             }
+            
+            // Option selected - proceed to submit
+            nextBtn.textContent = 'Submitting...';
+            nextBtn.disabled = true;
+            skipBtn.disabled = true;
+            
+            submitCurrentQuestion();
         });
-        document.getElementById('skipBtn').addEventListener('click', () => submitCurrentQuestion(true));
+        
+        // Skip button - allow skip without selection
+        document.getElementById('skipBtn').addEventListener('click', () => {
+            submitCurrentQuestion(true);
+        });
         
         // Initialize skill search with smart suggestions
         initSkillSearch();
