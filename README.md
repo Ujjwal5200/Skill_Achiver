@@ -5,9 +5,25 @@
   <img src="https://img.shields.io/badge/Python-3.10%2B-green" alt="Python">
   <img src="https://img.shields.io/badge/FastAPI-0.115.0-orange" alt="FastAPI">
   <img src="https://img.shields.io/badge/LLM-Groq-purple" alt="Groq">
+  <a href="https://github.com/ujjwalkaushik/Skill_Achiver/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow" alt="License"></a>
 </p>
 
-A production-ready AI-powered skill assessment platform that generates challenging technical exams using LLM technology.
+> A production-ready AI-powered skill assessment platform that generates challenging technical exams using LLM technology.
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [How It Works](#how-it-works)
+- [Supported Skills](#supported-skills)
+- [Quick Start](#quick-start)
+- [API Endpoints](#api-endpoints)
+- [Quiz Structure](#quiz-structure)
+- [Environment Variables](#environment-variables)
+- [Security Considerations](#security-considerations)
+- [License](#license)
 
 ---
 
@@ -45,7 +61,7 @@ Skill Achiver is an intelligent assessment platform designed to evaluate technic
 │   1. REGISTER          2. GENERATE         3. TAKE QUIZ          │
 │   ┌───────────┐       ┌───────────┐       ┌───────────┐          │
 │   │ Enter     │       │ AI creates │       │ Answer    │          │
-│   │ name, ID, │  ──→  │ 20 custom  │  ──→  │ 20 timed  │          │
+│   │ name, ID, │  ──→  │ 20 custom  │  ──→  │ 20 timed   │          │
 │   │ skill     │       │ questions  │       │ questions │          │
 │   └───────────┘       └───────────┘       └───────────┘          │
 │         │                   │                   │               │
@@ -79,20 +95,38 @@ Skill Achiver is an intelligent assessment platform designed to evaluate technic
 
 ## Quick Start
 
+### Prerequisites
+
+- Python 3.10+
+- Groq API Key ([get from console.groq.com](https://console.groq.com))
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/ujjwalkaushik/Skill_Achiver.git
+cd Skill_Achiver
+
 # Install dependencies
 pip install -r requirements.txt
-
-# Setup environment variable
-# Create .env file and add:
-GROQ_API_KEY=your_api_key_here
-
-# Run the server
-python main.py
-
-# Open in browser
-# http://localhost:8001/app
 ```
+
+### Configuration
+
+Create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_api_key_here
+```
+
+### Running
+
+```bash
+# Start the server
+python main.py
+```
+
+Access the web interface at: **http://localhost:8001/app**
 
 ---
 
@@ -112,10 +146,12 @@ python main.py
 
 ## Quiz Structure
 
-- **Total Questions**: 20
-- **Time Limit**: 60 minutes
-- **Difficulty**: Progressive (Basic → Advanced → Expert)
-- **Pass Rate Target**: 5-10% (designed to identify top talent)
+| Attribute | Value |
+|-----------|-------|
+| Total Questions | 20 |
+| Time Limit | 60 minutes |
+| Difficulty | Progressive (Basic → Advanced → Expert) |
+| Pass Rate Target | 5-10% (designed to identify top talent) |
 
 ---
 
@@ -123,23 +159,27 @@ python main.py
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GROQ_API_KEY` | Yes | Get from [groq.cloud](https://console.groq.com) |
+| `GROQ_API_KEY` | Yes | Your Groq API key |
 
 ---
 
-## Security Notes
+## Security Considerations
 
-- **CORS**: Currently allows all origins - restrict for production deployment
-- **Storage**: In-memory only - use Redis/PostgreSQL for production
-- **Rate Limiting**: Not implemented - add for production
-- **Authentication**: Not implemented - add for production
+> ⚠️ **Important**: The following settings are suitable for development/testing only. Before deploying to production, address these items:
+
+- **CORS**: Currently allows all origins - restrict to your domain(s)
+- **Storage**: In-memory only - use Redis/PostgreSQL for persistence
+- **Rate Limiting**: Not implemented - add per-endpoint rate limits
+- **Authentication**: Not implemented - implement user auth system
 
 ---
 
 ## License
 
-MIT License
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-<p align="center">Built with FastAPI + Groq LLM</p>
+<p align="center">
+  Built with <a href="https://fastapi.tiangolo.com">FastAPI</a> + <a href="https://groqcloud.com">Groq LLM</a>
+</p>
