@@ -9,14 +9,6 @@
   <a href="https://github.com/ujjwalkaushik/Skill_Achiver/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow" alt="License"></a>
 </p>
 
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ujjwalkaushik/Skill_Achiver&type=Date)](https://star-history.com/#ujjwalkaushik/Skill_Achiver&Date)
-
-[![Watch on GitHub](https://img.shields.io/github/watchers/ujjwalkaushik/Skill_Achiver?style=social)](https://github.com/ujjwalkaushik/Skill_Achiver/watchers)
-[![Follow on GitHub](https://img.shields.io/github/followers/ujjwalkaushik?style=social)](https://github.com/ujjwalkaushik/followers)
-
-</div>
 
 > A production-ready AI-powered skill assessment platform that generates challenging technical exams using LLM technology.
 
